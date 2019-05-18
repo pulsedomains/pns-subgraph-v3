@@ -25,6 +25,16 @@ export function handleNewOwner(event: NewOwner): void {
     domain.labelName = label
   }
 
+  if(label == null) {
+    label = '[' + event.params.label.toHexString().slice(2) + ']'
+  }
+  if(event.params.node.toHexString() == '0x0000000000000000000000000000000000000000000000000000000000000000') {
+    domain.name = label
+  } else {
+    let parent = Domain.load(event.params.node.toHexString())
+    domain.name = label + '.' + parent.name
+  }
+
   domain.owner = account.id
   domain.parent = event.params.node.toHexString()
   domain.labelhash = event.params.label

@@ -9,6 +9,7 @@ import {
 } from './types/Resolver/Resolver'
 
 import {
+  Resolver,
   AddrChanged,
   NameChanged,
   AbiChanged,
@@ -21,11 +22,17 @@ import {
 import { Bytes, BigInt, Address } from "@graphprotocol/graph-ts";
 
 export function handleAddrChanged(event: AddrChangedEvent): void {
+  let resolver = new Resolver(createResolverID(event.params.node, event.address))
+  resolver.domain = event.params.node.toHexString()
+  resolver.address = event.address
+  resolver.addr = event.params.a.toHexString()
+  resolver.save()
+
   let resolverEvent = new AddrChanged(createEventID(event.block.number, event.logIndex))
   resolverEvent.node = event.params.node
-  resolverEvent.resolver = createResolverID(event.params.node, event.address)
+  resolverEvent.resolver = resolver.id
   resolverEvent.node = event.params.node
-  resolverEvent.a = event.params.a
+  resolverEvent.a = event.params.a.toHexString()
   resolverEvent.save()
 }
 

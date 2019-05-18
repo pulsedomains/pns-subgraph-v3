@@ -44,8 +44,9 @@ type AuctionedName @entity {
 type Resolver @entity {
   id: ID!                   # Concatenation of resolver address and namehash
   domain: Domain!
-  address: Bytes!
+  address: Bytes!           # Address of resolver contract
 
+  addr: Account             # Current value of addr record (per events)
   resolverEvents: [ResolverEvent!]! @derivedFrom(field: "resolverID")
 }
 
@@ -59,7 +60,7 @@ type AddrChanged implements ResolverEvent @entity {
   id: ID!
   node: Bytes!
   resolver: Resolver!
-  a: Bytes!
+  a: Account!
 }
 
 type NameChanged implements ResolverEvent @entity {

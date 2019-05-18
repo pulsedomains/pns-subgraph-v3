@@ -59,7 +59,7 @@ export function handleNewResolver(event: NewResolver): void {
   let id = event.params.resolver.toHexString().concat('-').concat(event.params.node.toHexString())
   let resolver = new Resolver(id)
   resolver.domain = event.params.node.toHexString()
-  resolver.address = event.address
+  resolver.address = event.params.resolver
   resolver.save()
 
   let node = event.params.node.toHexString()

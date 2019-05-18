@@ -12,7 +12,6 @@ type Domain @entity {
 type Account @entity {
   id: ID!
   domains: [Domain!]! @derivedFrom(field: "owner")
-  domainCount: Int!
 }
 
 enum AuctionState {
@@ -22,16 +21,21 @@ enum AuctionState {
   FORBIDDEN
 }
 
+type Deed @entity {
+  id: ID!
+  owner: Account!
+  value: BigInt!
+}
+
 type AuctionedName @entity {
   id: ID!
   domain: Domain
   registrationDate: Int!
   releaseDate: Int
-  winningBidder: Account
-  maxBid: BigInt
+  deed: Deed
   secondBid: BigInt
   bidCount: Int!
-  state: AuctionState
+  state: AuctionState!
 }
 
 type Resolver @entity {

@@ -97,3 +97,21 @@ dataSources:
           handler: hashInvalidated
         - event: HashReleased(bytes32,uint256)
           handler: hashReleased
+  - kind: ethereum/contract
+    name: Deed
+    network: mainnet
+    source:
+      abi: Deed
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.2
+      language: wasm/assemblyscript
+      file: ./src/auctionRegistrar.ts
+      entities:
+        - AuctoinedName
+      abis:
+        - name: Deed
+          file: ./abis/Deed.json
+      eventHandlers:
+        - event: OwnerChanged(address)
+          handler: deedTransferred

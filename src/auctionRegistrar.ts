@@ -1,28 +1,40 @@
 // Import types and APIs from graph-ts
 import {
   Address,
+  BigInt,
   Bytes,
   ByteArray,
   crypto,
+  EthereumValue
 } from '@graphprotocol/graph-ts'
 
 // Import event types from the registry contract ABI
-import { AuctionStarted, NewBid, BidRevealed, HashRegistered, HashReleased, HashInvalidated } from './types/AuctionRegistrar/AuctionRegistrar'
+import {
+  AuctionRegistrar,
+  AuctionStarted,
+  NewBid,
+  BidRevealed,
+  HashRegistered,
+  HashReleased,
+  HashInvalidated
+} from './types/AuctionRegistrar/AuctionRegistrar'
+
+import {
+  OwnerChanged
+} from './types/Deed/Deed'
 
 // Import entity types generated from the GraphQL schema
-import { Account, AuctionedName } from './types/schema'
+import { Account, AuctionedName, Deed } from './types/schema'
 
 var rootNode:ByteArray = byteArrayFromHex("93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae")
 
 export function auctionStarted(event: AuctionStarted): void {
-  let auction = new AuctionedName(event.params.hash.toHex())
+  let name = new AuctionedName(event.params.hash.toHex())
 
-  auction.registrationDate = event.params.registrationDate.toI32()
-  auction.bidCount = 0
-  auction.maxBid = null
-  auction.secondBid = null
-  auction.state = "AUCTION"
-  auction.save()
+  name.registrationDate = event.params.registrationDate.toI32()
+  name.bidCount = 0
+  name.state = "AUCTION"
+  name.save()
 }
 
 export function bidRevealed(event: BidRevealed): void {
@@ -31,56 +43,71 @@ export function bidRevealed(event: BidRevealed): void {
     return
   }
 
-  let auction = AuctionedName.load(event.params.hash.toHex())
+  let name = AuctionedName.load(event.params.hash.toHex())
   switch(event.params.status) {
     case 0: // Harmless invalid bid
     case 1: // Bid revealed late
       break;
     case 4: // Bid lower than second bid
-      auction.bidCount += 1
+      name.bidCount += 1
       break;
     case 2: // New winning bid
-      let account = Account.load(event.params.owner.toHex())
-      if (account == null){
-        account = new Account(event.params.owner.toHex())
-        account.domainCount = 0
-      }
+      let account = new Account(event.params.owner.toHex())
       account.save()
 
-      auction.secondBid = auction.maxBid
-      auction.maxBid = event.params.value
-      auction.winningBidder = account.id
-      auction.bidCount += 1
+      let registrar = AuctionRegistrar.bind(event.address)
+      let deedAddress = registrar.call('entries', [EthereumValue.fromFixedBytes(event.params.hash)])[1].toAddress().toHex()
+
+      if(name.deed != null) {
+        let oldDeed = Deed.load(name.deed)
+        name.secondBid = oldDeed.value
+      }
+
+      let deed = new Deed(deedAddress)
+      deed.value = event.params.value
+      deed.owner = event.params.owner.toHex()
+      deed.save()
+
+      name.deed = deed.id
+      name.bidCount += 1
       break;
     case 3: // Runner up bid
-      auction.secondBid = event.params.value
-      auction.bidCount += 1
+      name.secondBid = event.params.value
+      name.bidCount += 1
       break;
   }
-  auction.save()
+  name.save()
 }
 
 export function hashRegistered(event: HashRegistered): void {
-  let auction = new AuctionedName(event.params.hash.toHex())
-  auction.secondBid = event.params.value
-  auction.winningBidder = event.params.owner.toHex()
-  auction.registrationDate = event.params.registrationDate.toI32()
-  auction.domain = crypto.keccak256(concat(rootNode, event.params.hash)).toHex();
-  auction.state = "FINALIZED"
-  auction.save()
+  let name = AuctionedName.load(event.params.hash.toHex())
+  name.registrationDate = event.params.registrationDate.toI32()
+  name.domain = crypto.keccak256(concat(rootNode, event.params.hash)).toHex();
+  name.state = "FINALIZED"
+  name.save()
+
+  let deed = Deed.load(name.deed)
+  deed.value = event.params.value
+  deed.save()
 }
 
 export function hashReleased(event: HashReleased): void {
-  let auction = new AuctionedName(event.params.hash.toHex())
-  auction.releaseDate = event.block.timestamp.toI32()
-  auction.state = "RELEASED"
-  auction.save()
+  let name = new AuctionedName(event.params.hash.toHex())
+  name.releaseDate = event.block.timestamp.toI32()
+  name.state = "RELEASED"
+  name.save()
 }
 
 export function hashInvalidated(event: HashInvalidated): void {
-  let auction = new AuctionedName(event.params.hash.toHex())
-  auction.state = "FORBIDDEN"
-  auction.save()
+  let name = new AuctionedName(event.params.hash.toHex())
+  name.state = "FORBIDDEN"
+  name.save()
+}
+
+export function deedTransferred(event: OwnerChanged): void {
+  let deed = new Deed(event.address.toHex())
+  deed.owner = event.params.newOwner.toHex()
+  deed.save()
 }
 
 // Helper for concatenating two byte arrays

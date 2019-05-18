@@ -22,7 +22,10 @@ import {
 
 import { Bytes, BigInt, Address } from "@graphprotocol/graph-ts";
 
+import { log } from '@graphprotocol/graph-ts'
+
 export function handleAddrChanged(event: AddrChangedEvent): void {
+  log.debug("AddrChanged event. Node: {}, Address: {}, a: {}", [event.params.node.toHexString(), event.address.toHexString(), event.params.a.toHexString()])
   let resolver = new Resolver(createResolverID(event.params.node, event.address))
   resolver.domain = event.params.node.toHexString()
   resolver.address = event.address
@@ -37,7 +40,7 @@ export function handleAddrChanged(event: AddrChangedEvent): void {
 
   let resolverEvent = new AddrChanged(createEventID(event.block.number, event.logIndex))
   resolverEvent.resolver = resolver.id
-  resolverEvent.a = event.params.a.toHexString()
+  resolverEvent.addr = event.params.a.toHexString()
   resolverEvent.save()
 }
 

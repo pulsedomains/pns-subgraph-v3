@@ -59,7 +59,7 @@ interface ResolverEvent {
 type AddrChanged implements ResolverEvent @entity {
   id: ID!
   resolver: Resolver!
-  a: Account!
+  addr: Account!
 }
 
 type NameChanged implements ResolverEvent @entity {

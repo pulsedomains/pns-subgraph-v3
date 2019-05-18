@@ -1,12 +1,12 @@
 type Domain @entity {
-  id: ID!
-  labelhash: Bytes
-  parent: Domain
-  subdomains: [Domain!]! @derivedFrom(field: "parent")
-  subdomainCount: Int!
+  id: ID!               # The namehash of the name
+  labelName: String     # The human readable label name (imported from CSV), if known
+  labelhash: Bytes      # keccak256(labelName)
+  parent: Domain        # The namehash (id) of the parent name
+  subdomains: [Domain!]! @derivedFrom(field: "parent")  # Can count domains from length of array
   owner: Account!
-  resolver: Bytes
-  ttl: Int
+  resolver: Resolver
+  ttl: BigInt
 }
 
 type Account @entity {
@@ -32,4 +32,79 @@ type AuctionedName @entity {
   secondBid: BigInt
   bidCount: Int!
   state: AuctionState
+}
+
+type Resolver @entity {
+  id: ID!                   # Concatenation of resolver address and namehash
+  domain: Domain!
+  address: Bytes!
+  resolverEvents: [ResolverEvent!]! @derivedFrom(field: "resolverID")
+}
+
+interface ResolverEvent {
+  id: ID!                   # Concatenation of block number and log ID
+  node: Bytes!
+  resolverID: Resolver!     # Used to derive relationships to Resolvers
+}
+
+type AddrChanged implements ResolverEvent @entity {
+  id: ID!
+  node: Bytes!
+  resolverID: Resolver!
+  a: Bytes!
+}
+
+type NameChanged implements ResolverEvent @entity {
+  id: ID!
+  node: Bytes!
+  resolverID: Resolver!
+  name: String!
+}
+
+type AbiChanged implements ResolverEvent @entity {
+  id: ID!
+  node: Bytes!
+  resolverID: Resolver!
+  contentType: BigInt!
+}
+
+type PubkeyChanged implements ResolverEvent @entity {
+  id: ID!
+  node: Bytes!
+  resolverID: Resolver!
+  x: Bytes!
+  y: Bytes!
+}
+
+# Currently not in use - follow this issue for status - https://github.com/graphprotocol/graph-node/issues/913
+#type TextChanged implements ResolverEvent @entity {
+#  id: ID!
+#  node: Bytes!
+#  resolverID: String!
+#  indexedKey: String!
+#  key: String!
+#}
+
+type ContenthashChanged implements ResolverEvent @entity {
+  id: ID!
+  node: Bytes!
+  resolverID: Resolver!
+  hash: Bytes!
+}
+
+type InterfaceChanged implements ResolverEvent @entity {
+  id: ID!
+  node: Bytes!
+  resolverID: Resolver!
+  interfaceID: Bytes!
+  implementer: Bytes!
+}
+
+type AuthorisationChanged implements ResolverEvent @entity {
+  id: ID!
+  node: Bytes!
+  resolverID: Resolver!
+  owner: Bytes!
+  target: Bytes!
+  isAuthorized: Boolean!
 }

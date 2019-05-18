@@ -1,73 +1,87 @@
 // Import types and APIs from graph-ts
 import {
-  Address,
-  Bytes,
   ByteArray,
   crypto,
+  ens,
 } from '@graphprotocol/graph-ts'
 
 // Import event types from the registry contract ABI
-import { NewOwner, Transfer as TransferEvent, NewResolver, NewTTL } from './types/ENSRegistry/EnsRegistry'
+import { NewOwner, Transfer, NewResolver, NewTTL } from './types/ENSRegistry/EnsRegistry'
 
 // Import entity types generated from the GraphQL schema
-import { Domain, Account } from './types/schema'
+import { Account, Domain, Resolver } from './types/schema'
 
 // Handler for NewOwner events
-export function newOwner(event: NewOwner): void {
-  let subnode = crypto.keccak256(concat(event.params.node, event.params.label)).toHex()
-
-  let account = new Account(event.params.owner.toHex())
+export function handleNewOwner(event: NewOwner): void {
+  let account = Account.load(event.params.owner.toHexString())
+  if (account == null){
+    account = new Account(event.params.owner.toHexString())
+    account.domainCount = 0
+  }
+  account.domainCount = account.domainCount + 1
   account.save()
 
+  let subnode = crypto.keccak256(concat(event.params.node, event.params.label)).toHexString()
   let domain = new Domain(subnode)
+
+  // Get label and node names
+  let label = ens.nameByHash(event.params.label.toHexString())
+  if (label != null) {
+    domain.labelName = label
+  }
+
   domain.owner = account.id
-  domain.parent = event.params.node.toHex()
+  domain.parent = event.params.node.toHexString()
   domain.labelhash = event.params.label
   domain.save()
-
 }
 
 // Handler for Transfer events
-export function transfer(event: TransferEvent): void {
-  let node = event.params.node.toHex()
+export function handleTransfer(event: Transfer): void {
+  let node = event.params.node.toHexString()
+  let oldDomain = Domain.load(node)
 
-  // // Create transfer if it does not exists yet
-  // let transfer = store.get('Transfer', domainId) as Transfer | null
-  // if (transfer == null) {
-  //   transfer = new Transfer()
-  //   transfer.domain = domainId
-  //   transfer.owners = new Array<Bytes>()
-  // }
-  //
-  // // Add the new owner to the list of historical owners of the domain
-  // let owners = transfer.owners
-  // owners.push(event.params.owner)
-  // transfer.owners = owners
+  // if domain does exist, we must minus that owners domain count
+  if (oldDomain != null) {
+    let oldOwner = Account.load(oldDomain.owner)
+      oldOwner.domainCount = oldOwner.domainCount - 1
+      oldOwner.save()
+  }
 
-  let account = new Account(event.params.owner.toHex())
-  account.save()
+  // Update Account count
+  let newAccount = Account.load(event.params.owner.toHexString())
+  if (newAccount == null){
+    newAccount = new Account(event.params.owner.toHexString())
+    newAccount.domainCount = 0
+  }
+  newAccount.domainCount = newAccount.domainCount + 1
+  newAccount.save()
 
   // Update the domain owner
   let domain = new Domain(node)
-  domain.owner = account.id
+  domain.owner = newAccount.id
   domain.save()
 }
 
 // Handler for NewResolver events
-export function newResolver(event: NewResolver): void {
-  let node = event.params.node.toHex()
+export function handleNewResolver(event: NewResolver): void {
+  let id = event.params.resolver.toHexString().concat('-').concat(event.params.node.toHexString())
+  let resolver = new Resolver(id)
+  resolver.domain = event.params.node.toHexString()
+  resolver.address = event.address
+  resolver.save()
 
+  let node = event.params.node.toHexString()
   let domain = new Domain(node)
-  domain.resolver = event.params.resolver
+  domain.resolver = id
   domain.save()
 }
 
 // Handler for NewTTL events
-export function newTTL(event: NewTTL): void {
-  let node = event.params.node.toHex()
-
+export function handleNewTTL(event: NewTTL): void {
+  let node = event.params.node.toHexString()
   let domain = new Domain(node)
-  domain.ttl = event.params.ttl.toI32()
+  domain.ttl = event.params.ttl
   domain.save()
 }
 

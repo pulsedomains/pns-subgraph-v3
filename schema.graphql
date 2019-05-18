@@ -13,6 +13,7 @@ type Domain @entity {
 type Account @entity {
   id: ID!
   domains: [Domain!]! @derivedFrom(field: "owner")
+  deeds: [Deed!]! @derivedFrom(field: "owner")
 }
 
 enum AuctionState {
@@ -44,6 +45,7 @@ type Resolver @entity {
   id: ID!                   # Concatenation of resolver address and namehash
   domain: Domain!
   address: Bytes!
+
   resolverEvents: [ResolverEvent!]! @derivedFrom(field: "resolverID")
 }
 

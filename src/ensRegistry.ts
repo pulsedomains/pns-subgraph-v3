@@ -64,6 +64,7 @@ export function handleNewResolver(event: NewResolver): void {
 
   let resolver = Resolver.load(id)
   if(resolver == null) {
+    resolver = new Resolver(id)
     resolver.domain = event.params.node.toHexString()
     resolver.address = event.params.resolver
     resolver.save()

@@ -23,7 +23,7 @@ import { Bytes, BigInt, Address } from "@graphprotocol/graph-ts";
 export function handleAddrChanged(event: AddrChangedEvent): void {
   let resolverEvent = new AddrChanged(createEventID(event.block.number, event.logIndex))
   resolverEvent.node = event.params.node
-  resolverEvent.resolverID = createResolverID(event.params.node, event.address)
+  resolverEvent.resolver = createResolverID(event.params.node, event.address)
   resolverEvent.node = event.params.node
   resolverEvent.a = event.params.a
   resolverEvent.save()
@@ -33,7 +33,7 @@ export function handleAddrChanged(event: AddrChangedEvent): void {
 export function handleNameChanged(event: NameChangedEvent): void {
   let resolverEvent = new NameChanged(createEventID(event.block.number, event.logIndex))
   resolverEvent.node = event.params.node
-  resolverEvent.resolverID = createResolverID(event.params.node, event.address)
+  resolverEvent.resolver = createResolverID(event.params.node, event.address)
   resolverEvent.name = event.params.name
   resolverEvent.save()
 }
@@ -41,7 +41,7 @@ export function handleNameChanged(event: NameChangedEvent): void {
 export function handleABIChanged(event: ABIChangedEvent): void {
   let resolverEvent = new AbiChanged(createEventID(event.block.number, event.logIndex))
   resolverEvent.node = event.params.node
-  resolverEvent.resolverID = createResolverID(event.params.node, event.address)
+  resolverEvent.resolver = createResolverID(event.params.node, event.address)
   resolverEvent.contentType = event.params.contentType
   resolverEvent.save()
 }
@@ -49,7 +49,7 @@ export function handleABIChanged(event: ABIChangedEvent): void {
 export function handlePubkeyChanged(event: PubkeyChangedEvent): void {
   let resolverEvent = new PubkeyChanged(createEventID(event.block.number, event.logIndex))
   resolverEvent.node = event.params.node
-  resolverEvent.resolverID = createResolverID(event.params.node, event.address)
+  resolverEvent.resolver = createResolverID(event.params.node, event.address)
   resolverEvent.x = event.params.x
   resolverEvent.y = event.params.y
   resolverEvent.save()
@@ -59,7 +59,7 @@ export function handlePubkeyChanged(event: PubkeyChangedEvent): void {
 // export function handleTextChanged(event: TextChangedEvent): void {
 //   let resolverEvent = new TextChanged(createEventID(event.block.number, event.logIndex))
 //   resolverEvent.node = event.params.node
-//   resolverEvent.resolverID = createResolverID(event.params.node, event.address)
+//   resolverEvent.resolver = createResolverID(event.params.node, event.address)
 //   resolverEvent.indexedKey = event.params.indexedKey
 //   resolverEvent.key = event.params.key
 //   resolverEvent.save()
@@ -68,7 +68,7 @@ export function handlePubkeyChanged(event: PubkeyChangedEvent): void {
 export function handleContentHashChanged(event: ContenthashChangedEvent): void {
   let resolverEvent = new ContenthashChanged(createEventID(event.block.number, event.logIndex))
   resolverEvent.node = event.params.node
-  resolverEvent.resolverID = createResolverID(event.params.node, event.address)
+  resolverEvent.resolver = createResolverID(event.params.node, event.address)
   resolverEvent.hash = event.params.hash
   resolverEvent.save()
 }
@@ -76,7 +76,7 @@ export function handleContentHashChanged(event: ContenthashChangedEvent): void {
 export function handleInterfaceChanged(event: InterfaceChangedEvent): void {
   let resolverEvent = new InterfaceChanged(createEventID(event.block.number, event.logIndex))
   resolverEvent.node = event.params.node
-  resolverEvent.resolverID = createResolverID(event.params.node, event.address)
+  resolverEvent.resolver = createResolverID(event.params.node, event.address)
   resolverEvent.interfaceID = event.params.interfaceID
   resolverEvent.implementer = event.params.implementer
   resolverEvent.save()
@@ -85,7 +85,7 @@ export function handleInterfaceChanged(event: InterfaceChangedEvent): void {
 export function handleAuthorisationChanged(event: AuthorisationChangedEvent): void {
   let resolverEvent = new AuthorisationChanged(createEventID(event.block.number, event.logIndex))
   resolverEvent.node = event.params.node
-  resolverEvent.resolverID = createResolverID(event.params.node, event.address)
+  resolverEvent.resolver = createResolverID(event.params.node, event.address)
   resolverEvent.owner = event.params.owner
   resolverEvent.target = event.params.target
   resolverEvent.isAuthorized = event.params.isAuthorised

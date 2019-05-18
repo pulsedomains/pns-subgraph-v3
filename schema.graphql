@@ -50,34 +50,34 @@ type Resolver @entity {
 interface ResolverEvent {
   id: ID!                   # Concatenation of block number and log ID
   node: Bytes!
-  resolverID: Resolver!     # Used to derive relationships to Resolvers
+  resolver: Resolver!     # Used to derive relationships to Resolvers
 }
 
 type AddrChanged implements ResolverEvent @entity {
   id: ID!
   node: Bytes!
-  resolverID: Resolver!
+  resolver: Resolver!
   a: Bytes!
 }
 
 type NameChanged implements ResolverEvent @entity {
   id: ID!
   node: Bytes!
-  resolverID: Resolver!
+  resolver: Resolver!
   name: String!
 }
 
 type AbiChanged implements ResolverEvent @entity {
   id: ID!
   node: Bytes!
-  resolverID: Resolver!
+  resolver: Resolver!
   contentType: BigInt!
 }
 
 type PubkeyChanged implements ResolverEvent @entity {
   id: ID!
   node: Bytes!
-  resolverID: Resolver!
+  resolver: Resolver!
   x: Bytes!
   y: Bytes!
 }
@@ -86,7 +86,7 @@ type PubkeyChanged implements ResolverEvent @entity {
 #type TextChanged implements ResolverEvent @entity {
 #  id: ID!
 #  node: Bytes!
-#  resolverID: String!
+#  resolver: String!
 #  indexedKey: String!
 #  key: String!
 #}
@@ -94,14 +94,14 @@ type PubkeyChanged implements ResolverEvent @entity {
 type ContenthashChanged implements ResolverEvent @entity {
   id: ID!
   node: Bytes!
-  resolverID: Resolver!
+  resolver: Resolver!
   hash: Bytes!
 }
 
 type InterfaceChanged implements ResolverEvent @entity {
   id: ID!
   node: Bytes!
-  resolverID: Resolver!
+  resolver: Resolver!
   interfaceID: Bytes!
   implementer: Bytes!
 }
@@ -109,7 +109,7 @@ type InterfaceChanged implements ResolverEvent @entity {
 type AuthorisationChanged implements ResolverEvent @entity {
   id: ID!
   node: Bytes!
-  resolverID: Resolver!
+  resolver: Resolver!
   owner: Bytes!
   target: Bytes!
   isAuthorized: Boolean!

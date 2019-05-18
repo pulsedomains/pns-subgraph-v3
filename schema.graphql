@@ -26,6 +26,7 @@ type Deed @entity {
   id: ID!
   owner: Account!
   value: BigInt!
+  name: AuctionedName @derivedFrom(field: "deed")
 }
 
 type AuctionedName @entity {

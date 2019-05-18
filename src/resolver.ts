@@ -9,6 +9,7 @@ import {
 } from './types/Resolver/Resolver'
 
 import {
+  Domain,
   Resolver,
   AddrChanged,
   NameChanged,
@@ -28,10 +29,14 @@ export function handleAddrChanged(event: AddrChangedEvent): void {
   resolver.addr = event.params.a.toHexString()
   resolver.save()
 
+  let domain = Domain.load(event.params.node.toHexString())
+  if(domain.resolver == resolver.id) {
+    domain.resolvedAddress = event.params.a.toHexString()
+    domain.save()
+  }
+
   let resolverEvent = new AddrChanged(createEventID(event.block.number, event.logIndex))
-  resolverEvent.node = event.params.node
   resolverEvent.resolver = resolver.id
-  resolverEvent.node = event.params.node
   resolverEvent.a = event.params.a.toHexString()
   resolverEvent.save()
 }
@@ -39,7 +44,6 @@ export function handleAddrChanged(event: AddrChangedEvent): void {
 
 export function handleNameChanged(event: NameChangedEvent): void {
   let resolverEvent = new NameChanged(createEventID(event.block.number, event.logIndex))
-  resolverEvent.node = event.params.node
   resolverEvent.resolver = createResolverID(event.params.node, event.address)
   resolverEvent.name = event.params.name
   resolverEvent.save()
@@ -47,7 +51,6 @@ export function handleNameChanged(event: NameChangedEvent): void {
 
 export function handleABIChanged(event: ABIChangedEvent): void {
   let resolverEvent = new AbiChanged(createEventID(event.block.number, event.logIndex))
-  resolverEvent.node = event.params.node
   resolverEvent.resolver = createResolverID(event.params.node, event.address)
   resolverEvent.contentType = event.params.contentType
   resolverEvent.save()
@@ -55,7 +58,6 @@ export function handleABIChanged(event: ABIChangedEvent): void {
 
 export function handlePubkeyChanged(event: PubkeyChangedEvent): void {
   let resolverEvent = new PubkeyChanged(createEventID(event.block.number, event.logIndex))
-  resolverEvent.node = event.params.node
   resolverEvent.resolver = createResolverID(event.params.node, event.address)
   resolverEvent.x = event.params.x
   resolverEvent.y = event.params.y
@@ -65,7 +67,6 @@ export function handlePubkeyChanged(event: PubkeyChangedEvent): void {
 // Currently not in use - follow this issue for status - https://github.com/graphprotocol/graph-node/issues/913
 // export function handleTextChanged(event: TextChangedEvent): void {
 //   let resolverEvent = new TextChanged(createEventID(event.block.number, event.logIndex))
-//   resolverEvent.node = event.params.node
 //   resolverEvent.resolver = createResolverID(event.params.node, event.address)
 //   resolverEvent.indexedKey = event.params.indexedKey
 //   resolverEvent.key = event.params.key
@@ -74,7 +75,6 @@ export function handlePubkeyChanged(event: PubkeyChangedEvent): void {
 
 export function handleContentHashChanged(event: ContenthashChangedEvent): void {
   let resolverEvent = new ContenthashChanged(createEventID(event.block.number, event.logIndex))
-  resolverEvent.node = event.params.node
   resolverEvent.resolver = createResolverID(event.params.node, event.address)
   resolverEvent.hash = event.params.hash
   resolverEvent.save()
@@ -82,7 +82,6 @@ export function handleContentHashChanged(event: ContenthashChangedEvent): void {
 
 export function handleInterfaceChanged(event: InterfaceChangedEvent): void {
   let resolverEvent = new InterfaceChanged(createEventID(event.block.number, event.logIndex))
-  resolverEvent.node = event.params.node
   resolverEvent.resolver = createResolverID(event.params.node, event.address)
   resolverEvent.interfaceID = event.params.interfaceID
   resolverEvent.implementer = event.params.implementer
@@ -91,7 +90,6 @@ export function handleInterfaceChanged(event: InterfaceChangedEvent): void {
 
 export function handleAuthorisationChanged(event: AuthorisationChangedEvent): void {
   let resolverEvent = new AuthorisationChanged(createEventID(event.block.number, event.logIndex))
-  resolverEvent.node = event.params.node
   resolverEvent.resolver = createResolverID(event.params.node, event.address)
   resolverEvent.owner = event.params.owner
   resolverEvent.target = event.params.target

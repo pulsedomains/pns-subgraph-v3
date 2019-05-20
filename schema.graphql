@@ -48,7 +48,7 @@ type Resolver @entity {
   address: Bytes!           # Address of resolver contract
 
   addr: Account             # Current value of addr record (per events)
-  resolverEvents: [ResolverEvent!]! @derivedFrom(field: "resolver")
+  events: [ResolverEvent!]! @derivedFrom(field: "resolver")
 }
 
 interface ResolverEvent {

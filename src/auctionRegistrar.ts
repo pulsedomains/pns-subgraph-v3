@@ -105,9 +105,11 @@ export function hashInvalidated(event: HashInvalidated): void {
 }
 
 export function deedTransferred(event: OwnerChanged): void {
-  let deed = new Deed(event.address.toHex())
-  deed.owner = event.params.newOwner.toHex()
-  deed.save()
+  let deed = Deed.load(event.address.toHex())
+  if(deed != null) {
+    deed.owner = event.params.newOwner.toHex()
+    deed.save()
+  }
 }
 
 // Helper for concatenating two byte arrays

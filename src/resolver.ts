@@ -21,7 +21,7 @@ import {
   AuthorisationChanged,
 } from './types/schema'
 
-import { Bytes, BigInt, Address } from "@graphprotocol/graph-ts";
+import { Bytes, BigInt, Address, EthereumEvent } from "@graphprotocol/graph-ts";
 
 import { log } from '@graphprotocol/graph-ts'
 
@@ -41,30 +41,38 @@ export function handleAddrChanged(event: AddrChangedEvent): void {
     domain.save()
   }
 
-  let resolverEvent = new AddrChanged(createEventID(event.block.number, event.logIndex))
+  let resolverEvent = new AddrChanged(createEventID(event))
   resolverEvent.resolver = resolver.id
+  resolverEvent.blockNumber = event.block.number.toI32()
+  resolverEvent.transactionID = event.transaction.hash
   resolverEvent.addr = event.params.a.toHexString()
   resolverEvent.save()
 }
 
 
 export function handleNameChanged(event: NameChangedEvent): void {
-  let resolverEvent = new NameChanged(createEventID(event.block.number, event.logIndex))
+  let resolverEvent = new NameChanged(createEventID(event))
   resolverEvent.resolver = createResolverID(event.params.node, event.address)
+  resolverEvent.blockNumber = event.block.number.toI32()
+  resolverEvent.transactionID = event.transaction.hash
   resolverEvent.name = event.params.name
   resolverEvent.save()
 }
 
 export function handleABIChanged(event: ABIChangedEvent): void {
-  let resolverEvent = new AbiChanged(createEventID(event.block.number, event.logIndex))
+  let resolverEvent = new AbiChanged(createEventID(event))
   resolverEvent.resolver = createResolverID(event.params.node, event.address)
+  resolverEvent.blockNumber = event.block.number.toI32()
+  resolverEvent.transactionID = event.transaction.hash
   resolverEvent.contentType = event.params.contentType
   resolverEvent.save()
 }
 
 export function handlePubkeyChanged(event: PubkeyChangedEvent): void {
-  let resolverEvent = new PubkeyChanged(createEventID(event.block.number, event.logIndex))
+  let resolverEvent = new PubkeyChanged(createEventID(event))
   resolverEvent.resolver = createResolverID(event.params.node, event.address)
+  resolverEvent.blockNumber = event.block.number.toI32()
+  resolverEvent.transactionID = event.transaction.hash
   resolverEvent.x = event.params.x
   resolverEvent.y = event.params.y
   resolverEvent.save()
@@ -72,7 +80,9 @@ export function handlePubkeyChanged(event: PubkeyChangedEvent): void {
 
 // Currently not in use - follow this issue for status - https://github.com/graphprotocol/graph-node/issues/913
 // export function handleTextChanged(event: TextChangedEvent): void {
-//   let resolverEvent = new TextChanged(createEventID(event.block.number, event.logIndex))
+//   let resolverEvent = new TextChanged(createEventID(event))
+//   resolverEvent.blockNumber = event.block.number.toI32()
+//   resolverEvent.transactionID = event.transaction.hash
 //   resolverEvent.resolver = createResolverID(event.params.node, event.address)
 //   resolverEvent.indexedKey = event.params.indexedKey
 //   resolverEvent.key = event.params.key
@@ -80,22 +90,28 @@ export function handlePubkeyChanged(event: PubkeyChangedEvent): void {
 // }
 
 export function handleContentHashChanged(event: ContenthashChangedEvent): void {
-  let resolverEvent = new ContenthashChanged(createEventID(event.block.number, event.logIndex))
+  let resolverEvent = new ContenthashChanged(createEventID(event))
   resolverEvent.resolver = createResolverID(event.params.node, event.address)
+  resolverEvent.blockNumber = event.block.number.toI32()
+  resolverEvent.transactionID = event.transaction.hash
   resolverEvent.hash = event.params.hash
   resolverEvent.save()
 }
 
 export function handleInterfaceChanged(event: InterfaceChangedEvent): void {
-  let resolverEvent = new InterfaceChanged(createEventID(event.block.number, event.logIndex))
+  let resolverEvent = new InterfaceChanged(createEventID(event))
   resolverEvent.resolver = createResolverID(event.params.node, event.address)
+  resolverEvent.blockNumber = event.block.number.toI32()
+  resolverEvent.transactionID = event.transaction.hash
   resolverEvent.interfaceID = event.params.interfaceID
   resolverEvent.implementer = event.params.implementer
   resolverEvent.save()
 }
 
 export function handleAuthorisationChanged(event: AuthorisationChangedEvent): void {
-  let resolverEvent = new AuthorisationChanged(createEventID(event.block.number, event.logIndex))
+  let resolverEvent = new AuthorisationChanged(createEventID(event))
+  resolverEvent.blockNumber = event.block.number.toI32()
+  resolverEvent.transactionID = event.transaction.hash
   resolverEvent.resolver = createResolverID(event.params.node, event.address)
   resolverEvent.owner = event.params.owner
   resolverEvent.target = event.params.target
@@ -103,8 +119,8 @@ export function handleAuthorisationChanged(event: AuthorisationChangedEvent): vo
   resolverEvent.save()
 }
 
-function createEventID(blockNumber: BigInt, logIndex: BigInt): string {
-  return blockNumber.toString().concat('-').concat(logIndex.toString())
+function createEventID(event: EthereumEvent): string {
+  return event.block.number.toString().concat('-').concat(event.logIndex.toString())
 }
 
 function createResolverID(node: Bytes, resolver: Address): string {

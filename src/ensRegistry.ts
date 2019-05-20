@@ -3,16 +3,22 @@ import {
   ByteArray,
   crypto,
   ens,
+  EthereumEvent,
 } from '@graphprotocol/graph-ts'
 
 // Import event types from the registry contract ABI
-import { NewOwner, Transfer, NewResolver, NewTTL } from './types/ENSRegistry/EnsRegistry'
+import {
+  NewOwner as NewOwnerEvent,
+  Transfer as TransferEvent,
+  NewResolver as NewResolverEvent,
+  NewTTL as NewTTLEvent
+} from './types/ENSRegistry/EnsRegistry'
 
 // Import entity types generated from the GraphQL schema
-import { Account, Domain, Resolver } from './types/schema'
+import { Account, Domain, Resolver, NewOwner, Transfer, NewResolver, NewTTL } from './types/schema'
 
 // Handler for NewOwner events
-export function handleNewOwner(event: NewOwner): void {
+export function handleNewOwner(event: NewOwnerEvent): void {
   let account = new Account(event.params.owner.toHexString())
   account.save()
 
@@ -39,10 +45,17 @@ export function handleNewOwner(event: NewOwner): void {
   domain.parent = event.params.node.toHexString()
   domain.labelhash = event.params.label
   domain.save()
+
+  let domainEvent = new NewOwner(createEventID(event))
+  domainEvent.blockNumber = event.block.number.toI32()
+  domainEvent.transactionID = event.transaction.hash
+  domainEvent.domain = domain.id
+  domainEvent.owner = account.id
+  domainEvent.save()
 }
 
 // Handler for Transfer events
-export function handleTransfer(event: Transfer): void {
+export function handleTransfer(event: TransferEvent): void {
   let node = event.params.node.toHexString()
 
   let account = new Account(event.params.owner.toHexString())
@@ -52,10 +65,17 @@ export function handleTransfer(event: Transfer): void {
   let domain = new Domain(node)
   domain.owner = account.id
   domain.save()
+
+  let domainEvent = new Transfer(createEventID(event))
+  domainEvent.blockNumber = event.block.number.toI32()
+  domainEvent.transactionID = event.transaction.hash
+  domainEvent.domain = node
+  domainEvent.owner = account.id
+  domainEvent.save()
 }
 
 // Handler for NewResolver events
-export function handleNewResolver(event: NewResolver): void {
+export function handleNewResolver(event: NewResolverEvent): void {
   let id = event.params.resolver.toHexString().concat('-').concat(event.params.node.toHexString())
 
   let node = event.params.node.toHexString()
@@ -73,14 +93,28 @@ export function handleNewResolver(event: NewResolver): void {
   }
 
   domain.save()
+
+  let domainEvent = new NewResolver(createEventID(event))
+  domainEvent.blockNumber = event.block.number.toI32()
+  domainEvent.transactionID = event.transaction.hash
+  domainEvent.domain = node
+  domainEvent.resolver = id
+  domainEvent.save()
 }
 
 // Handler for NewTTL events
-export function handleNewTTL(event: NewTTL): void {
+export function handleNewTTL(event: NewTTLEvent): void {
   let node = event.params.node.toHexString()
   let domain = new Domain(node)
   domain.ttl = event.params.ttl
   domain.save()
+
+  let domainEvent = new NewTTL(createEventID(event))
+  domainEvent.blockNumber = event.block.number.toI32()
+  domainEvent.transactionID = event.transaction.hash
+  domainEvent.domain = node
+  domainEvent.ttl = event.params.ttl
+  domainEvent.save()
 }
 
 // Helper for concatenating two byte arrays
@@ -93,4 +127,8 @@ function concat(a: ByteArray, b: ByteArray): ByteArray {
     out[a.length + j] = b[j]
   }
   return out as ByteArray
+}
+
+function createEventID(event: EthereumEvent): string {
+  return event.block.number.toString().concat('-').concat(event.logIndex.toString())
 }

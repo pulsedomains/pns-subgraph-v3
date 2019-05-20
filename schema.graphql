@@ -11,6 +11,45 @@ type Domain @entity {
   ttl: BigInt
 }
 
+interface DomainEvent {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
+}
+
+type Transfer implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
+  owner: Account!
+}
+
+type NewOwner implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
+  owner: Account!
+}
+
+type NewResolver implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
+  resolver: Resolver!
+}
+
+type NewTTL implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
+  ttl: BigInt!
+}
+
 type Account @entity {
   id: ID!
   domains: [Domain!]! @derivedFrom(field: "owner")
@@ -54,29 +93,39 @@ type Resolver @entity {
 interface ResolverEvent {
   id: ID!                   # Concatenation of block number and log ID
   resolver: Resolver!       # Used to derive relationships to Resolvers
+  blockNumber: Int!
+  transactionID: Bytes!
 }
 
 type AddrChanged implements ResolverEvent @entity {
   id: ID!
   resolver: Resolver!
+  blockNumber: Int!
+  transactionID: Bytes!
   addr: Account!
 }
 
 type NameChanged implements ResolverEvent @entity {
   id: ID!
   resolver: Resolver!
+  blockNumber: Int!
+  transactionID: Bytes!
   name: String!
 }
 
 type AbiChanged implements ResolverEvent @entity {
   id: ID!
   resolver: Resolver!
+  blockNumber: Int!
+  transactionID: Bytes!
   contentType: BigInt!
 }
 
 type PubkeyChanged implements ResolverEvent @entity {
   id: ID!
   resolver: Resolver!
+  blockNumber: Int!
+  transactionID: Bytes!
   x: Bytes!
   y: Bytes!
 }
@@ -85,6 +134,8 @@ type PubkeyChanged implements ResolverEvent @entity {
 #type TextChanged implements ResolverEvent @entity {
 #  id: ID!
 #  resolver: String!
+#  blockNumber: Int!
+#  transactionID: Bytes!
 #  indexedKey: String!
 #  key: String!
 #}
@@ -92,12 +143,16 @@ type PubkeyChanged implements ResolverEvent @entity {
 type ContenthashChanged implements ResolverEvent @entity {
   id: ID!
   resolver: Resolver!
+  blockNumber: Int!
+  transactionID: Bytes!
   hash: Bytes!
 }
 
 type InterfaceChanged implements ResolverEvent @entity {
   id: ID!
   resolver: Resolver!
+  blockNumber: Int!
+  transactionID: Bytes!
   interfaceID: Bytes!
   implementer: Bytes!
 }
@@ -105,6 +160,8 @@ type InterfaceChanged implements ResolverEvent @entity {
 type AuthorisationChanged implements ResolverEvent @entity {
   id: ID!
   resolver: Resolver!
+  blockNumber: Int!
+  transactionID: Bytes!
   owner: Bytes!
   target: Bytes!
   isAuthorized: Boolean!

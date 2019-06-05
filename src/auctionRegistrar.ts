@@ -31,7 +31,7 @@ var rootNode:ByteArray = byteArrayFromHex("93cdeb708b7545dc668eb9280176169d1c33c
 export function auctionStarted(event: AuctionStarted): void {
   let name = new AuctionedName(event.params.hash.toHex())
 
-  name.registrationDate = event.params.registrationDate.toI32()
+  name.registrationDate = event.params.registrationDate
   name.bidCount = 0
   name.state = "AUCTION"
   name.save()
@@ -81,7 +81,7 @@ export function bidRevealed(event: BidRevealed): void {
 
 export function hashRegistered(event: HashRegistered): void {
   let name = AuctionedName.load(event.params.hash.toHex())
-  name.registrationDate = event.params.registrationDate.toI32()
+  name.registrationDate = event.params.registrationDate
   name.domain = crypto.keccak256(concat(rootNode, event.params.hash)).toHex();
   name.state = "FINALIZED"
   name.save()
@@ -93,7 +93,7 @@ export function hashRegistered(event: HashRegistered): void {
 
 export function hashReleased(event: HashReleased): void {
   let name = new AuctionedName(event.params.hash.toHex())
-  name.releaseDate = event.block.timestamp.toI32()
+  name.releaseDate = event.block.timestamp
   name.state = "RELEASED"
   name.save()
 }

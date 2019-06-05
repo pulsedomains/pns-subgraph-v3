@@ -54,6 +54,7 @@ type Account @entity {
   id: ID!
   domains: [Domain!]! @derivedFrom(field: "owner")
   deeds: [Deed!]! @derivedFrom(field: "owner")
+  registrations: [Registration!] @derivedFrom(field: "registrant")
 }
 
 enum AuctionState {
@@ -73,12 +74,53 @@ type Deed @entity {
 type AuctionedName @entity {
   id: ID!
   domain: Domain
-  registrationDate: Int!
-  releaseDate: Int
+  registrationDate: BigInt!
+  releaseDate: BigInt
   deed: Deed
   secondBid: BigInt
   bidCount: Int!
   state: AuctionState!
+}
+
+type Registration @entity {
+  id: ID!
+  domain: Domain
+  registrationDate: BigInt!
+  expiryDate: BigInt!
+  registrant: Account!
+}
+
+interface RegistrationEvent {
+  id: ID!
+  registration: Registration!
+  blockNumber: Int!
+  transactionID: Bytes!
+}
+
+type NameMigrated implements RegistrationEvent @entity {
+  id: ID!
+  registration: Registration!
+  blockNumber: Int!
+  transactionID: Bytes!
+  registrant: Account!
+  expiryDate: BigInt!
+}
+
+type NameRegistered implements RegistrationEvent @entity {
+  id: ID!
+  registration: Registration!
+  blockNumber: Int!
+  transactionID: Bytes!
+  registrant: Account!
+  expiryDate: BigInt!
+}
+
+type NameRenewed implements RegistrationEvent @entity {
+  id: ID!
+  registration: Registration!
+  blockNumber: Int!
+  transactionID: Bytes!
+  expiryDate: BigInt!
 }
 
 type Resolver @entity {

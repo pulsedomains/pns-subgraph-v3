@@ -97,6 +97,51 @@ dataSources:
           handler: hashInvalidated
         - event: HashReleased(bytes32,uint256)
           handler: hashReleased
+  - kind: ethereum/contract
+    name: BaseRegistrar
+    network: mainnet
+    source:
+      address: '0xfac7bea255a6990f749363002136af6556b31e04'
+      abi: BaseRegistrar
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.2
+      language: wasm/assemblyscript
+      file: ./src/ethRegistrar.ts
+      entities:
+        - Registration
+        - NameRegistered
+        - NameMigrated
+        - NameRenewed
+      abis:
+        - name: BaseRegistrar
+          file: ./abis/BaseRegistrar.json
+      eventHandlers:
+        - event: NameMigrated(uint256,address,uint256)
+          handler: handleNameMigrated
+        - event: NameRegistered(uint256,address,uint256)
+          handler: handleNameRegistered
+        - event: NameRenewed(uint256,uint256)
+          handler: handleNameRenewed
+  - kind: ethereum/contract
+    name: EthRegistrarController
+    network: mainnet
+    source:
+      address: '0xfac7bea255a6990f749363002136af6556b31e04'
+      abi: EthRegistrarController
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.2
+      language: wasm/assemblyscript
+      file: ./src/ethRegistrar.ts
+      entities:
+        - Registration
+      abis:
+        - name: EthRegistrarController
+          file: ./abis/EthRegistrarController.json
+      eventHandlers:
+        - event: NameRegistered(string,bytes32,address,uint256,uint256)
+          handler: handleNameRegisteredByController
   # - kind: ethereum/contract
   #   name: Deed
   #   network: mainnet

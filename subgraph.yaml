@@ -82,7 +82,9 @@ dataSources:
       language: wasm/assemblyscript
       file: ./src/auctionRegistrar.ts
       entities:
+        - Account
         - AuctionedName
+        - Deed
       abis:
         - name: AuctionRegistrar
           file: ./abis/AuctionRegistrar.json
@@ -153,7 +155,7 @@ dataSources:
   #     language: wasm/assemblyscript
   #     file: ./src/auctionRegistrar.ts
   #     entities:
-  #       - AuctoinedName
+  #       - AuctionedName
   #     abis:
   #       - name: Deed
   #         file: ./abis/Deed.json

@@ -19,9 +19,9 @@ import {
   HashInvalidated
 } from './types/AuctionRegistrar/AuctionRegistrar'
 
-import {
-  OwnerChanged
-} from './types/Deed/Deed'
+// import {
+//   OwnerChanged
+// } from './types/Deed/Deed'
 
 // Import entity types generated from the GraphQL schema
 import { Account, AuctionedName, Deed } from './types/schema'
@@ -104,13 +104,13 @@ export function hashInvalidated(event: HashInvalidated): void {
   name.save()
 }
 
-export function deedTransferred(event: OwnerChanged): void {
-  let deed = Deed.load(event.address.toHex())
-  if(deed != null) {
-    deed.owner = event.params.newOwner.toHex()
-    deed.save()
-  }
-}
+// export function deedTransferred(event: OwnerChanged): void {
+//   let deed = Deed.load(event.address.toHex())
+//   if(deed != null) {
+//     deed.owner = event.params.newOwner.toHex()
+//     deed.save()
+//   }
+// }
 
 // Helper for concatenating two byte arrays
 function concat(a: ByteArray, b: ByteArray): ByteArray {

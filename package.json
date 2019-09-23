@@ -14,6 +14,6 @@
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.11.2",
-    "@graphprotocol/graph-ts": "git://github.com/graphprotocol/graph-ts.git#master"
+    "@graphprotocol/graph-ts": "^0.15.1"
   }
 }

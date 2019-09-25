@@ -68,8 +68,8 @@ dataSources:
           handler: handleNameChanged
         - event: PubkeyChanged(bytes32,bytes32,bytes32)
           handler: handlePubkeyChanged
-#        - event: TextChanged(bytes32,string,string)
-#          handler: handleTextChanged
+        - event: TextChanged(bytes32,string,string)
+          handler: handleTextChanged
   - kind: ethereum/contract
     name: AuctionRegistrar
     network: mainnet

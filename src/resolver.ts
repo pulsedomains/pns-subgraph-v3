@@ -6,6 +6,7 @@ import {
   InterfaceChanged as InterfaceChangedEvent,
   NameChanged as NameChangedEvent,
   PubkeyChanged as PubkeyChangedEvent,
+  TextChanged as TextChangedEvent,
 } from './types/Resolver/Resolver'
 
 import {
@@ -19,6 +20,7 @@ import {
   ContenthashChanged,
   InterfaceChanged,
   AuthorisationChanged,
+  TextChanged,
 } from './types/schema'
 
 import { Bytes, BigInt, Address, EthereumEvent } from "@graphprotocol/graph-ts";
@@ -78,16 +80,20 @@ export function handlePubkeyChanged(event: PubkeyChangedEvent): void {
   resolverEvent.save()
 }
 
-// Currently not in use - follow this issue for status - https://github.com/graphprotocol/graph-node/issues/913
-// export function handleTextChanged(event: TextChangedEvent): void {
-//   let resolverEvent = new TextChanged(createEventID(event))
-//   resolverEvent.blockNumber = event.block.number.toI32()
-//   resolverEvent.transactionID = event.transaction.hash
-//   resolverEvent.resolver = createResolverID(event.params.node, event.address)
-//   resolverEvent.indexedKey = event.params.indexedKey
-//   resolverEvent.key = event.params.key
-//   resolverEvent.save()
-// }
+export function handleTextChanged(event: TextChangedEvent): void {
+  let resolver = Resolver.load(createResolverID(event.params.node, event.address))
+  if(!resolver.texts.includes(event.params.key)) {
+    resolver.texts.push(event.params.key)
+    resolver.save()
+  }
+
+  let resolverEvent = new TextChanged(createEventID(event))
+  resolverEvent.resolver = createResolverID(event.params.node, event.address)
+  resolverEvent.blockNumber = event.block.number.toI32()
+  resolverEvent.transactionID = event.transaction.hash
+  resolverEvent.key = event.params.key
+  resolverEvent.save()
+}
 
 export function handleContentHashChanged(event: ContenthashChangedEvent): void {
   let resolverEvent = new ContenthashChanged(createEventID(event))

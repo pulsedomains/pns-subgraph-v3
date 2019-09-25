@@ -130,6 +130,7 @@ type Resolver @entity {
   address: Bytes!           # Address of resolver contract
 
   addr: Account             # Current value of addr record (per events)
+  texts: [String!]!         # Set of observed text record keys
   events: [ResolverEvent!]! @derivedFrom(field: "resolver")
 }
 
@@ -173,15 +174,13 @@ type PubkeyChanged implements ResolverEvent @entity {
   y: Bytes!
 }
 
-# Currently not in use - follow this issue for status - https://github.com/graphprotocol/graph-node/issues/913
-#type TextChanged implements ResolverEvent @entity {
-#  id: ID!
-#  resolver: String!
-#  blockNumber: Int!
-#  transactionID: Bytes!
-#  indexedKey: String!
-#  key: String!
-#}
+type TextChanged implements ResolverEvent @entity {
+  id: ID!
+  resolver: Resolver!
+  blockNumber: Int!
+  transactionID: Bytes!
+  key: String!
+}
 
 type ContenthashChanged implements ResolverEvent @entity {
   id: ID!

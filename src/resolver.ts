@@ -82,7 +82,12 @@ export function handlePubkeyChanged(event: PubkeyChangedEvent): void {
 
 export function handleTextChanged(event: TextChangedEvent): void {
   let resolver = Resolver.load(createResolverID(event.params.node, event.address))
-  if(!resolver.texts.includes(event.params.key)) {
+  resolver.domain = event.params.node.toHexString()
+  resolver.address = event.address
+  if(resolver.texts == null) {
+    resolver.texts = [event.params.key];
+    resolver.save();
+  } else if(!resolver.texts.includes(event.params.key)) {
     resolver.texts.push(event.params.key)
     resolver.save()
   }

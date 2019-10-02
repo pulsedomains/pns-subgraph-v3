@@ -130,7 +130,7 @@ type Resolver @entity {
   address: Bytes!           # Address of resolver contract
 
   addr: Account             # Current value of addr record (per events)
-  texts: [String!]!         # Set of observed text record keys
+  texts: [String!]          # Set of observed text record keys
   events: [ResolverEvent!]! @derivedFrom(field: "resolver")
 }
 

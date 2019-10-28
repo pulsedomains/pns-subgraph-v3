@@ -43,6 +43,7 @@ dataSources:
       file: ./src/resolver.ts
       entities:
         - AddrChanged
+        - MulticoinAddrChanged
         - NameChanged
         - AbiChanged
         - PubkeyChanged
@@ -58,6 +59,8 @@ dataSources:
           handler: handleABIChanged
         - event: AddrChanged(bytes32,address)
           handler: handleAddrChanged
+        - event: AddressChanged(bytes32,uint256,bytes)
+          handler: handleMulticoinAddrChanged
         - event: AuthorisationChanged(bytes32,address,address,bool)
           handler: handleAuthorisationChanged
         - event: ContenthashChanged(bytes32,bytes)

@@ -1,6 +1,7 @@
 import {
   ABIChanged as ABIChangedEvent,
   AddrChanged as AddrChangedEvent,
+  AddressChanged as AddressChangedEvent,
   AuthorisationChanged as AuthorisationChangedEvent,
   ContenthashChanged as ContenthashChangedEvent,
   InterfaceChanged as InterfaceChangedEvent,
@@ -14,6 +15,7 @@ import {
   Domain,
   Resolver,
   AddrChanged,
+  MulticoinAddrChanged,
   NameChanged,
   AbiChanged,
   PubkeyChanged,
@@ -51,6 +53,26 @@ export function handleAddrChanged(event: AddrChangedEvent): void {
   resolverEvent.save()
 }
 
+export function handleMulticoinAddrChanged(event: AddressChangedEvent): void {
+  let resolver = getOrCreateResolver(event.params.node, event.address)
+
+  let coinType = event.params.coinType.toI32()
+  if(resolver.coinTypes == null) {
+    resolver.coinTypes = [coinType];
+    resolver.save();
+  } else if(!resolver.coinTypes.includes(coinType)) {
+    resolver.coinTypes.push(coinType)
+    resolver.save()
+  }
+
+  let resolverEvent = new MulticoinAddrChanged(createEventID(event))
+  resolverEvent.resolver = resolver.id
+  resolverEvent.blockNumber = event.block.number.toI32()
+  resolverEvent.transactionID = event.transaction.hash
+  resolverEvent.coinType = coinType
+  resolverEvent.addr = event.params.newAddress
+  resolverEvent.save()
+}
 
 export function handleNameChanged(event: NameChangedEvent): void {
   let resolverEvent = new NameChanged(createEventID(event))
@@ -81,12 +103,7 @@ export function handlePubkeyChanged(event: PubkeyChangedEvent): void {
 }
 
 export function handleTextChanged(event: TextChangedEvent): void {
-  let resolver = Resolver.load(createResolverID(event.params.node, event.address))
-  if(resolver == null) {
-    resolver = new Resolver(createResolverID(event.params.node, event.address))
-    resolver.domain = event.params.node.toHexString()
-    resolver.address = event.address
-  }
+  let resolver = getOrCreateResolver(event.params.node, event.address)
   if(resolver.texts == null) {
     resolver.texts = [event.params.key];
     resolver.save();
@@ -131,6 +148,17 @@ export function handleAuthorisationChanged(event: AuthorisationChangedEvent): vo
   resolverEvent.target = event.params.target
   resolverEvent.isAuthorized = event.params.isAuthorised
   resolverEvent.save()
+}
+
+function getOrCreateResolver(node: Bytes, address: Address): Resolver {
+  let id = createResolverID(node, address)
+  let resolver = Resolver.load(id)
+  if(resolver === null) {
+    resolver = new Resolver(id)
+    resolver.domain = node.toHexString()
+    resolver.address = address
+  }
+  return resolver as Resolver
 }
 
 function createEventID(event: EthereumEvent): string {

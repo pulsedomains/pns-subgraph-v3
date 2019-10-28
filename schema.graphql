@@ -139,6 +139,7 @@ type Resolver @entity {
 
   addr: Account             # Current value of addr record (per events)
   texts: [String!]          # Set of observed text record keys
+  coinTypes: [Int!]         # Set of observed SLIP-44 coin types
   events: [ResolverEvent!]! @derivedFrom(field: "resolver")
 }
 
@@ -155,6 +156,15 @@ type AddrChanged implements ResolverEvent @entity {
   blockNumber: Int!
   transactionID: Bytes!
   addr: Account!
+}
+
+type MulticoinAddrChanged implements ResolverEvent @entity {
+  id: ID!
+  resolver: Resolver!
+  blockNumber: Int!
+  transactionID: Bytes!
+  coinType: Int!
+  addr: Bytes!
 }
 
 type NameChanged implements ResolverEvent @entity {

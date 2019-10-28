@@ -124,6 +124,14 @@ type NameRenewed implements RegistrationEvent @entity {
   expiryDate: BigInt!
 }
 
+type NameTransferred implements RegistrationEvent @entity {
+  id: ID!
+  registration: Registration!
+  blockNumber: Int!
+  transactionID: Bytes!
+  newOwner: Account!
+}
+
 type Resolver @entity {
   id: ID!                   # Concatenation of resolver address and namehash
   domain: Domain!

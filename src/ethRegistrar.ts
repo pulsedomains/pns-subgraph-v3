@@ -11,7 +11,8 @@ import {
 import {
   NameMigrated as NameMigratedEvent,
   NameRegistered as NameRegisteredEvent,
-  NameRenewed as NameRenewedEvent
+  NameRenewed as NameRenewedEvent,
+  Transfer as TransferEvent,
 } from './types/BaseRegistrar/BaseRegistrar'
 
 import {
@@ -19,7 +20,7 @@ import {
 } from './types/EthRegistrarController/EthRegistrarController'
 
 // Import entity types generated from the GraphQL schema
-import { Account, AuctionedName, Domain, Registration, NameMigrated, NameRegistered, NameRenewed } from './types/schema'
+import { Account, AuctionedName, Domain, Registration, NameMigrated, NameRegistered, NameRenewed, NameTransferred } from './types/schema'
 
 var rootNode:ByteArray = byteArrayFromHex("93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae")
 
@@ -86,6 +87,20 @@ export function handleNameRenewed(event: NameRenewedEvent): void {
   registrationEvent.transactionID = event.transaction.hash
   registrationEvent.expiryDate = event.params.expires
   registrationEvent.save()
+}
+
+export function handleNameTransferred(event: TransferEvent): void {
+  let label = uint256ToByteArray(event.params.tokenId)
+  let registration = new Registration(label.toHex())
+  registration.registrant = event.params.to.toHex()
+  registration.save()
+
+  let transferEvent = new NameTransferred(createEventID(event))
+  transferEvent.registration = registration.id
+  transferEvent.blockNumber = event.block.number.toI32()
+  transferEvent.transactionID = event.transaction.hash
+  transferEvent.newOwner = registration.registrant
+  transferEvent.save()
 }
 
 // Helper for concatenating two byte arrays

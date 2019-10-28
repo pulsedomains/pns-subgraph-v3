@@ -115,6 +115,7 @@ dataSources:
         - NameRegistered
         - NameMigrated
         - NameRenewed
+        - NameTransferred
       abis:
         - name: BaseRegistrar
           file: ./abis/BaseRegistrar.json
@@ -125,6 +126,8 @@ dataSources:
           handler: handleNameRegistered
         - event: NameRenewed(uint256,uint256)
           handler: handleNameRenewed
+        - event: Transfer(address,address,uint256)
+          handler: handleNameTransferred
   - kind: ethereum/contract
     name: EthRegistrarController
     network: mainnet

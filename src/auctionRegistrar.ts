@@ -59,9 +59,11 @@ export function bidRevealed(event: BidRevealed): void {
       let registrar = AuctionRegistrar.bind(event.address)
       let deedAddress = registrar.call('entries', [EthereumValue.fromFixedBytes(event.params.hash)])[1].toAddress().toHex()
 
-      if(name.deed != null) {
+      if(name.deed !== null) {
         let oldDeed = Deed.load(name.deed)
-        name.secondBid = oldDeed.value
+        if(oldDeed !== null) {
+          name.secondBid = oldDeed.value
+        }
       }
 
       let deed = new Deed(deedAddress)
@@ -88,8 +90,10 @@ export function hashRegistered(event: HashRegistered): void {
   name.save()
 
   let deed = Deed.load(name.deed)
-  deed.value = event.params.value
-  deed.save()
+  if(deed !== null) {
+    deed.value = event.params.value
+    deed.save()
+  }
 }
 
 export function hashReleased(event: HashReleased): void {

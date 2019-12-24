@@ -1,10 +1,13 @@
 // Import types and APIs from graph-ts
 import {
-  ByteArray,
   crypto,
-  ens,
-  EthereumEvent,
+  ens
 } from '@graphprotocol/graph-ts'
+
+import { log } from '@graphprotocol/graph-ts'
+import {
+  createEventID, loadOrCreateDomain, concat
+} from './utils'
 
 // Import event types from the registry contract ABI
 import {
@@ -21,10 +24,8 @@ import { Account, Domain, Resolver, NewOwner, Transfer, NewResolver, NewTTL } fr
 export function handleNewOwner(event: NewOwnerEvent): void {
   let account = new Account(event.params.owner.toHexString())
   account.save()
-
   let subnode = crypto.keccak256(concat(event.params.node, event.params.label)).toHexString()
-  let domain = new Domain(subnode)
-
+  let domain = loadOrCreateDomain(subnode)
   if(domain.name == null) {
     // Get label and node names
     let label = ens.nameByHash(event.params.label.toHexString())
@@ -59,12 +60,11 @@ export function handleNewOwner(event: NewOwnerEvent): void {
 // Handler for Transfer events
 export function handleTransfer(event: TransferEvent): void {
   let node = event.params.node.toHexString()
-
   let account = new Account(event.params.owner.toHexString())
   account.save()
 
   // Update the domain owner
-  let domain = new Domain(node)
+  let domain = loadOrCreateDomain(node)
   domain.owner = account.id
   domain.save()
 
@@ -81,7 +81,7 @@ export function handleNewResolver(event: NewResolverEvent): void {
   let id = event.params.resolver.toHexString().concat('-').concat(event.params.node.toHexString())
 
   let node = event.params.node.toHexString()
-  let domain = new Domain(node)
+  let domain = loadOrCreateDomain(node)
   domain.resolver = id
 
   let resolver = Resolver.load(id)
@@ -107,7 +107,7 @@ export function handleNewResolver(event: NewResolverEvent): void {
 // Handler for NewTTL events
 export function handleNewTTL(event: NewTTLEvent): void {
   let node = event.params.node.toHexString()
-  let domain = new Domain(node)
+  let domain = loadOrCreateDomain(node)
   domain.ttl = event.params.ttl
   domain.save()
 
@@ -117,20 +117,4 @@ export function handleNewTTL(event: NewTTLEvent): void {
   domainEvent.domain = node
   domainEvent.ttl = event.params.ttl
   domainEvent.save()
-}
-
-// Helper for concatenating two byte arrays
-function concat(a: ByteArray, b: ByteArray): ByteArray {
-  let out = new Uint8Array(a.length + b.length)
-  for (let i = 0; i < a.length; i++) {
-    out[i] = a[i]
-  }
-  for (let j = 0; j < b.length; j++) {
-    out[a.length + j] = b[j]
-  }
-  return out as ByteArray
-}
-
-function createEventID(event: EthereumEvent): string {
-  return event.block.number.toString().concat('-').concat(event.logIndex.toString())
 }

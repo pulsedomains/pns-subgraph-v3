@@ -1,11 +1,13 @@
 // Import types and APIs from graph-ts
 import {
-  BigInt,
   ByteArray,
   crypto,
-  ens,
-  EthereumEvent,
 } from '@graphprotocol/graph-ts'
+
+import {
+  createEventID, loadOrCreateRegistration, loadOrCreateDomain, 
+  uint256ToByteArray, byteArrayFromHex, concat
+} from './utils'
 
 // Import event types from the registry contract ABI
 import {
@@ -29,7 +31,7 @@ export function handleNameMigrated(event: NameMigratedEvent): void {
 
   let auctionedName = AuctionedName.load(label.toHex())
 
-  let registration = new Registration(label.toHex())
+  let registration = loadOrCreateRegistration(label.toHex())
   registration.domain = crypto.keccak256(concat(rootNode, label)).toHex();
   registration.registrationDate = auctionedName.registrationDate
   registration.expiryDate = event.params.expires
@@ -50,7 +52,7 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
   account.save()
 
   let label = uint256ToByteArray(event.params.id)
-  let registration = new Registration(label.toHex())
+  let registration = loadOrCreateRegistration(label.toHex())
   registration.domain = crypto.keccak256(concat(rootNode, label)).toHex()
   registration.registrationDate = event.block.timestamp
   registration.expiryDate = event.params.expires
@@ -67,7 +69,7 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
 }
 
 export function handleNameRegisteredByController(event: ControllerNameRegisteredEvent): void {
-  let domain = new Domain(crypto.keccak256(concat(rootNode, event.params.label)).toHex())
+  let domain = loadOrCreateDomain(crypto.keccak256(concat(rootNode, event.params.label)).toHex())
   if(domain.labelName !== event.params.name) {
     domain.labelName = event.params.name
     domain.name = event.params.name + '.eth'
@@ -77,7 +79,7 @@ export function handleNameRegisteredByController(event: ControllerNameRegistered
 
 export function handleNameRenewed(event: NameRenewedEvent): void {
   let label = uint256ToByteArray(event.params.id)
-  let registration = new Registration(label.toHex())
+  let registration = loadOrCreateRegistration(label.toHex())
   registration.expiryDate = event.params.expires
   registration.save()
 
@@ -91,46 +93,17 @@ export function handleNameRenewed(event: NameRenewedEvent): void {
 
 export function handleNameTransferred(event: TransferEvent): void {
   let label = uint256ToByteArray(event.params.tokenId)
-  let registration = new Registration(label.toHex())
-  registration.registrant = event.params.to.toHex()
-  registration.save()
-
+  // Do not create new registration
+  let registration = Registration.load(label.toHex())
   let transferEvent = new NameTransferred(createEventID(event))
-  transferEvent.registration = registration.id
+  transferEvent.registration = label.toHex()
   transferEvent.blockNumber = event.block.number.toI32()
   transferEvent.transactionID = event.transaction.hash
-  transferEvent.newOwner = registration.registrant
+  // This is when minting new name, called by _mint()
+  if(registration == null){
+    transferEvent.newOwner = event.params.to.toHex()    
+  }else{
+    transferEvent.newOwner = registration.registrant
+  }
   transferEvent.save()
-}
-
-// Helper for concatenating two byte arrays
-function concat(a: ByteArray, b: ByteArray): ByteArray {
-  let out = new Uint8Array(a.length + b.length)
-  for (let i = 0; i < a.length; i++) {
-    out[i] = a[i]
-  }
-  for (let j = 0; j < b.length; j++) {
-    out[a.length + j] = b[j]
-  }
-  return out as ByteArray
-}
-
-function byteArrayFromHex(s: string): ByteArray {
-  if(s.length % 2 !== 0) {
-    throw new TypeError("Hex string must have an even number of characters")
-  }
-  let out = new Uint8Array(s.length / 2)
-  for(var i = 0; i < s.length; i += 2) {
-    out[i / 2] = parseInt(s.substring(i, i + 2), 16) as u32
-  }
-  return out as ByteArray;
-}
-
-function uint256ToByteArray(i: BigInt): ByteArray {
-  let hex = i.toHex().slice(2).padStart(64, '0')
-  return byteArrayFromHex(hex)
-}
-
-function createEventID(event: EthereumEvent): string {
-  return event.block.number.toString().concat('-').concat(event.logIndex.toString())
 }

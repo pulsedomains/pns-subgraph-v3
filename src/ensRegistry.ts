@@ -4,7 +4,6 @@ import {
   ens
 } from '@graphprotocol/graph-ts'
 
-import { log } from '@graphprotocol/graph-ts'
 import {
   createEventID, concat, ROOT_NODE, EMPTY_ADDRESS
 } from './utils'

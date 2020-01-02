@@ -5,7 +5,7 @@ import {
 } from '@graphprotocol/graph-ts'
 
 import {
-  createEventID, loadOrCreateRegistration, loadOrCreateDomain, 
+  createEventID, ROOT_NODE, EMPTY_ADDRESS,
   uint256ToByteArray, byteArrayFromHex, concat
 } from './utils'
 
@@ -31,7 +31,7 @@ export function handleNameMigrated(event: NameMigratedEvent): void {
 
   let auctionedName = AuctionedName.load(label.toHex())
 
-  let registration = loadOrCreateRegistration(label.toHex())
+  let registration = new Registration(label.toHex())
   registration.domain = crypto.keccak256(concat(rootNode, label)).toHex();
   registration.registrationDate = auctionedName.registrationDate
   registration.expiryDate = event.params.expires
@@ -52,7 +52,7 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
   account.save()
 
   let label = uint256ToByteArray(event.params.id)
-  let registration = loadOrCreateRegistration(label.toHex())
+  let registration = new Registration(label.toHex())
   registration.domain = crypto.keccak256(concat(rootNode, label)).toHex()
   registration.registrationDate = event.block.timestamp
   registration.expiryDate = event.params.expires
@@ -69,7 +69,7 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
 }
 
 export function handleNameRegisteredByController(event: ControllerNameRegisteredEvent): void {
-  let domain = loadOrCreateDomain(crypto.keccak256(concat(rootNode, event.params.label)).toHex())
+  let domain = newDomain(crypto.keccak256(concat(rootNode, event.params.label)).toHex())
   if(domain.labelName !== event.params.name) {
     domain.labelName = event.params.name
     domain.name = event.params.name + '.eth'
@@ -79,7 +79,7 @@ export function handleNameRegisteredByController(event: ControllerNameRegistered
 
 export function handleNameRenewed(event: NameRenewedEvent): void {
   let label = uint256ToByteArray(event.params.id)
-  let registration = loadOrCreateRegistration(label.toHex())
+  let registration = new Registration(label.toHex())
   registration.expiryDate = event.params.expires
   registration.save()
 
@@ -106,4 +106,12 @@ export function handleNameTransferred(event: TransferEvent): void {
     transferEvent.newOwner = registration.registrant
   }
   transferEvent.save()
+}
+
+export function newDomain(node:string): Domain {
+  let domain = new Domain(node)
+  if(node == ROOT_NODE){
+    domain.owner = EMPTY_ADDRESS
+  }
+  return domain as Domain
 }

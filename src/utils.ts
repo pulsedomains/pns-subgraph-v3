@@ -14,26 +14,6 @@ export function createEventID(event: EthereumEvent): string {
 export const ROOT_NODE = '0x0000000000000000000000000000000000000000000000000000000000000000'
 export const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000'
 
-export function loadOrCreateDomain(node:string): Domain {
-  let domain = Domain.load(node)
-  if (domain == null){
-    domain = new Domain(node)
-    if(node == ROOT_NODE){
-      domain.owner = EMPTY_ADDRESS
-    }
-  }
-  return domain as Domain
-}
-
-export function loadOrCreateRegistration(label:string): Registration {
-  let registration = Registration.load(label)
-  
-  if (registration == null){
-    registration = new Registration(label)
-  }
-  return registration as Registration
-}
-
 // Helper for concatenating two byte arrays
 export function concat(a: ByteArray, b: ByteArray): ByteArray {
   let out = new Uint8Array(a.length + b.length)

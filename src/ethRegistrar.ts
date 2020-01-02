@@ -93,13 +93,16 @@ export function handleNameRenewed(event: NameRenewedEvent): void {
 
 export function handleNameTransferred(event: TransferEvent): void {
   let label = uint256ToByteArray(event.params.tokenId)
-  // Do not create new registration
-  let registration = Registration.load(label.toHex())
   let transferEvent = new NameTransferred(createEventID(event))
   transferEvent.registration = label.toHex()
   transferEvent.blockNumber = event.block.number.toI32()
   transferEvent.transactionID = event.transaction.hash
+  // This registration is loaded to refer to registration.registrant.
+  let registration = Registration.load(label.toHex())
   // This is when minting new name, called by _mint()
+  // Saving the object at this stage will throw an error 
+  // because other mandatory fields (eg: registrationDate) are not set
+  // when minting as ERC721 token
   if(registration == null){
     transferEvent.newOwner = event.params.to.toHex()    
   }else{

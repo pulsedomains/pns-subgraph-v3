@@ -23,8 +23,10 @@ import { Account, Domain, Resolver, NewOwner, Transfer, NewResolver, NewTTL } fr
 export function handleNewOwner(event: NewOwnerEvent): void {
   let account = new Account(event.params.owner.toHexString())
   account.save()
+
   let subnode = crypto.keccak256(concat(event.params.node, event.params.label)).toHexString()
   let domain = new Domain(subnode)
+
   if(domain.name == null) {
     // Get label and node names
     let label = ens.nameByHash(event.params.label.toHexString())
@@ -59,8 +61,10 @@ export function handleNewOwner(event: NewOwnerEvent): void {
 // Handler for Transfer events
 export function handleTransfer(event: TransferEvent): void {
   let node = event.params.node.toHexString()
+
   let account = new Account(event.params.owner.toHexString())
   account.save()
+
   // Update the domain owner
   let domain = new Domain(node)
   domain.owner = account.id

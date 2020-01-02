@@ -4,8 +4,6 @@ import {
   ByteArray,
   EthereumEvent,
 } from '@graphprotocol/graph-ts'
-// Import entity types generated from the GraphQL schema
-import { Domain, Registration } from './types/schema'
 
 export function createEventID(event: EthereumEvent): string {
   return event.block.number.toString().concat('-').concat(event.logIndex.toString())

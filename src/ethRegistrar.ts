@@ -69,7 +69,7 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
 }
 
 export function handleNameRegisteredByController(event: ControllerNameRegisteredEvent): void {
-  let domain = newDomain(crypto.keccak256(concat(rootNode, event.params.label)).toHex())
+  let domain = new Domain(crypto.keccak256(concat(rootNode, event.params.label)).toHex())
   if(domain.labelName !== event.params.name) {
     domain.labelName = event.params.name
     domain.name = event.params.name + '.eth'
@@ -106,12 +106,4 @@ export function handleNameTransferred(event: TransferEvent): void {
     transferEvent.newOwner = registration.registrant
   }
   transferEvent.save()
-}
-
-export function newDomain(node:string): Domain {
-  let domain = new Domain(node)
-  if(node == ROOT_NODE){
-    domain.owner = EMPTY_ADDRESS
-  }
-  return domain as Domain
 }

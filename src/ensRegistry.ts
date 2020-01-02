@@ -25,7 +25,7 @@ export function handleNewOwner(event: NewOwnerEvent): void {
   let account = new Account(event.params.owner.toHexString())
   account.save()
   let subnode = crypto.keccak256(concat(event.params.node, event.params.label)).toHexString()
-  let domain = newDomain(subnode)
+  let domain = new Domain(subnode)
   if(domain.name == null) {
     // Get label and node names
     let label = ens.nameByHash(event.params.label.toHexString())
@@ -62,9 +62,8 @@ export function handleTransfer(event: TransferEvent): void {
   let node = event.params.node.toHexString()
   let account = new Account(event.params.owner.toHexString())
   account.save()
-
   // Update the domain owner
-  let domain = newDomain(node)
+  let domain = new Domain(node)
   domain.owner = account.id
   domain.save()
 
@@ -81,7 +80,11 @@ export function handleNewResolver(event: NewResolverEvent): void {
   let id = event.params.resolver.toHexString().concat('-').concat(event.params.node.toHexString())
 
   let node = event.params.node.toHexString()
-  let domain = newDomain(node)
+  let domain = new Domain(node)
+  if(node == ROOT_NODE){
+    domain.owner = EMPTY_ADDRESS
+  }
+
   domain.resolver = id
 
   let resolver = Resolver.load(id)
@@ -107,7 +110,7 @@ export function handleNewResolver(event: NewResolverEvent): void {
 // Handler for NewTTL events
 export function handleNewTTL(event: NewTTLEvent): void {
   let node = event.params.node.toHexString()
-  let domain = newDomain(node)
+  let domain = new Domain(node)
   domain.ttl = event.params.ttl
   domain.save()
 
@@ -117,12 +120,4 @@ export function handleNewTTL(event: NewTTLEvent): void {
   domainEvent.domain = node
   domainEvent.ttl = event.params.ttl
   domainEvent.save()
-}
-
-export function newDomain(node:string): Domain {
-  let domain = new Domain(node)
-  if(node == ROOT_NODE){
-    domain.owner = EMPTY_ADDRESS
-  }
-  return domain as Domain
 }

@@ -93,14 +93,14 @@ export function handleNameRenewed(event: NameRenewedEvent): void {
 
 export function handleNameTransferred(event: TransferEvent): void {
   let label = uint256ToByteArray(event.params.tokenId)
-  let transferEvent = new NameTransferred(createEventID(event))
   let registrant = event.params.to.toHex()
   let registration = Registration.load(label.toHex())
-  if(registration != null){
-    registration.registrant = registrant
-    registration.save()
-  }
+  if(registration != null) return;
 
+  registration.registrant = registrant
+  registration.save()
+
+  let transferEvent = new NameTransferred(createEventID(event))
   transferEvent.registration = label.toHex()
   transferEvent.blockNumber = event.block.number.toI32()
   transferEvent.transactionID = event.transaction.hash

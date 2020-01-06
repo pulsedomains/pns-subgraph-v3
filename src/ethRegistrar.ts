@@ -1,11 +1,13 @@
 // Import types and APIs from graph-ts
 import {
-  BigInt,
   ByteArray,
   crypto,
-  ens,
-  EthereumEvent,
 } from '@graphprotocol/graph-ts'
+
+import {
+  createEventID, ROOT_NODE, EMPTY_ADDRESS,
+  uint256ToByteArray, byteArrayFromHex, concat
+} from './utils'
 
 // Import event types from the registry contract ABI
 import {
@@ -91,46 +93,17 @@ export function handleNameRenewed(event: NameRenewedEvent): void {
 
 export function handleNameTransferred(event: TransferEvent): void {
   let label = uint256ToByteArray(event.params.tokenId)
-  let registration = new Registration(label.toHex())
-  registration.registrant = event.params.to.toHex()
+  let registrant = event.params.to.toHex()
+  let registration = Registration.load(label.toHex())
+  if(registration == null) return;
+
+  registration.registrant = registrant
   registration.save()
 
   let transferEvent = new NameTransferred(createEventID(event))
-  transferEvent.registration = registration.id
+  transferEvent.registration = label.toHex()
   transferEvent.blockNumber = event.block.number.toI32()
   transferEvent.transactionID = event.transaction.hash
-  transferEvent.newOwner = registration.registrant
+  transferEvent.newOwner = registrant
   transferEvent.save()
-}
-
-// Helper for concatenating two byte arrays
-function concat(a: ByteArray, b: ByteArray): ByteArray {
-  let out = new Uint8Array(a.length + b.length)
-  for (let i = 0; i < a.length; i++) {
-    out[i] = a[i]
-  }
-  for (let j = 0; j < b.length; j++) {
-    out[a.length + j] = b[j]
-  }
-  return out as ByteArray
-}
-
-function byteArrayFromHex(s: string): ByteArray {
-  if(s.length % 2 !== 0) {
-    throw new TypeError("Hex string must have an even number of characters")
-  }
-  let out = new Uint8Array(s.length / 2)
-  for(var i = 0; i < s.length; i += 2) {
-    out[i / 2] = parseInt(s.substring(i, i + 2), 16) as u32
-  }
-  return out as ByteArray;
-}
-
-function uint256ToByteArray(i: BigInt): ByteArray {
-  let hex = i.toHex().slice(2).padStart(64, '0')
-  return byteArrayFromHex(hex)
-}
-
-function createEventID(event: EthereumEvent): string {
-  return event.block.number.toString().concat('-').concat(event.logIndex.toString())
 }

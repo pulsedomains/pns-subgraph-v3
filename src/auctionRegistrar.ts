@@ -26,6 +26,7 @@ import {
 
 // Import entity types generated from the GraphQL schema
 import { Account, AuctionedName, Deed } from './types/schema'
+import { byteArrayFromHex, concat } from './utils'
 
 var rootNode:ByteArray = byteArrayFromHex("93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae")
 
@@ -126,25 +127,3 @@ export function deedClosed(event: DeedClosed): void {
   }
 }
 
-// Helper for concatenating two byte arrays
-function concat(a: ByteArray, b: ByteArray): ByteArray {
-  let out = new Uint8Array(a.length + b.length)
-  for (let i = 0; i < a.length; i++) {
-    out[i] = a[i]
-  }
-  for (let j = 0; j < b.length; j++) {
-    out[a.length + j] = b[j]
-  }
-  return out as ByteArray
-}
-
-function byteArrayFromHex(s: string): ByteArray {
-  if(s.length % 2 !== 0) {
-    throw new TypeError("Hex string must have an even number of characters")
-  }
-  let out = new Uint8Array(s.length / 2)
-  for(var i = 0; i < s.length; i += 2) {
-    out[i / 2] = parseInt(s.substring(i, i + 2), 16) as u32
-  }
-  return out as ByteArray;
-}

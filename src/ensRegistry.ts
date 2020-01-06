@@ -1,10 +1,12 @@
 // Import types and APIs from graph-ts
 import {
-  ByteArray,
   crypto,
-  ens,
-  EthereumEvent,
+  ens
 } from '@graphprotocol/graph-ts'
+
+import {
+  createEventID, concat, ROOT_NODE, EMPTY_ADDRESS
+} from './utils'
 
 // Import event types from the registry contract ABI
 import {
@@ -82,6 +84,10 @@ export function handleNewResolver(event: NewResolverEvent): void {
 
   let node = event.params.node.toHexString()
   let domain = new Domain(node)
+  if(node == ROOT_NODE){
+    domain.owner = EMPTY_ADDRESS
+  }
+
   domain.resolver = id
 
   let resolver = Resolver.load(id)
@@ -117,20 +123,4 @@ export function handleNewTTL(event: NewTTLEvent): void {
   domainEvent.domain = node
   domainEvent.ttl = event.params.ttl
   domainEvent.save()
-}
-
-// Helper for concatenating two byte arrays
-function concat(a: ByteArray, b: ByteArray): ByteArray {
-  let out = new Uint8Array(a.length + b.length)
-  for (let i = 0; i < a.length; i++) {
-    out[i] = a[i]
-  }
-  for (let j = 0; j < b.length; j++) {
-    out[a.length + j] = b[j]
-  }
-  return out as ByteArray
-}
-
-function createEventID(event: EthereumEvent): string {
-  return event.block.number.toString().concat('-').concat(event.logIndex.toString())
 }

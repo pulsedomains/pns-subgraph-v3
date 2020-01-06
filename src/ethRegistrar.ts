@@ -95,7 +95,7 @@ export function handleNameTransferred(event: TransferEvent): void {
   let label = uint256ToByteArray(event.params.tokenId)
   let registrant = event.params.to.toHex()
   let registration = Registration.load(label.toHex())
-  if(registration != null) return;
+  if(registration == null) return;
 
   registration.registrant = registrant
   registration.save()

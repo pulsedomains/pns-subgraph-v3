@@ -38,10 +38,6 @@ export function handleNameMigrated(event: NameMigratedEvent): void {
   registration.registrant = event.params.owner.toHex()
   registration.save()
 
-  let domain = new Domain(registration.domain)
-  domain.isMigrated = true
-  domain.save()
-
   let registrationEvent = new NameMigrated(createEventID(event))
   registrationEvent.registration = registration.id
   registrationEvent.blockNumber = event.block.number.toI32()

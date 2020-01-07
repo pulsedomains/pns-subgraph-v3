@@ -5,7 +5,7 @@ import {
 } from '@graphprotocol/graph-ts'
 
 import {
-  createEventID, concat, ROOT_NODE, EMPTY_ADDRESS
+  createEventID, concat, ROOT_NODE, EMPTY_ADDRESS, ETH_NODE
 } from './utils'
 
 // Import event types from the registry contract ABI
@@ -20,7 +20,7 @@ import {
 import { Account, Domain, Resolver, NewOwner, Transfer, NewResolver, NewTTL } from './types/schema'
 
 // Handler for NewOwner events
-export function handleNewOwner(event: NewOwnerEvent): void {
+function _handleNewOwner(event: NewOwnerEvent, isMigrated:boolean): void {
   let account = new Account(event.params.owner.toHexString())
   account.save()
 
@@ -48,6 +48,7 @@ export function handleNewOwner(event: NewOwnerEvent): void {
   domain.owner = account.id
   domain.parent = event.params.node.toHexString()
   domain.labelhash = event.params.label
+  domain.isMigrated = isMigrated
   domain.save()
 
   let domainEvent = new NewOwner(createEventID(event))
@@ -123,4 +124,41 @@ export function handleNewTTL(event: NewTTLEvent): void {
   domainEvent.domain = node
   domainEvent.ttl = event.params.ttl
   domainEvent.save()
+}
+
+export function handleNewOwner(event: NewOwnerEvent): void {
+  _handleNewOwner(event, true)
+}
+
+export function handleNewOwnerOldReigstry(event: NewOwnerEvent): void {
+  let node = event.params.node.toHexString()
+  if(node != ETH_NODE && node != ROOT_NODE ){
+    // Either subdomain or non .eth addresses
+    _handleNewOwner(event, false)
+  }
+}
+export function handleNewResolverOldReigstry(event: NewResolverEvent): void {
+  let domain = Domain.load(event.params.node.toHexString())
+  if(domain){
+    if(domain.isMigrated == false){
+      handleNewResolver(event)
+    }
+  }
+}
+export function handleNewTTLOldReigstry(event: NewTTLEvent): void {
+  let domain = Domain.load(event.params.node.toHexString())
+  if(domain){
+    if(domain.isMigrated == false){
+      handleNewTTL(event)
+    }
+  }
+}
+
+export function handleTransferOldReigstry(event: TransferEvent): void {
+  let domain = Domain.load(event.params.node.toHexString())
+  if(domain){
+    if(domain.isMigrated == false){
+      handleTransfer(event)
+    }
+  }
 }

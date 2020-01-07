@@ -38,6 +38,10 @@ export function handleNameMigrated(event: NameMigratedEvent): void {
   registration.registrant = event.params.owner.toHex()
   registration.save()
 
+  let domain = new Domain(registration.domain)
+  domain.isMigrated = true
+  domain.save()
+
   let registrationEvent = new NameMigrated(createEventID(event))
   registrationEvent.registration = registration.id
   registrationEvent.blockNumber = event.block.number.toI32()
@@ -73,6 +77,7 @@ export function handleNameRegisteredByController(event: ControllerNameRegistered
   if(domain.labelName !== event.params.name) {
     domain.labelName = event.params.name
     domain.name = event.params.name + '.eth'
+    domain.isMigrated = true
     domain.save()
   }
 }

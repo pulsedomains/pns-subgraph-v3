@@ -9,6 +9,7 @@ type Domain @entity {
   owner: Account!
   resolver: Resolver
   ttl: BigInt
+  isMigrated: Boolean!
   events: [DomainEvent!]! @derivedFrom(field: "domain")
 }
 

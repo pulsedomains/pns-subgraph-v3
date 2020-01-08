@@ -32,7 +32,7 @@ dataSources:
         - event: NewTTL(bytes32,uint64)
           handler: handleNewTTL
   - kind: ethereum/contract
-    name: ENSRegistry
+    name: ENSRegistryOld
     network: mainnet
     source:
       address: '0x1246Ddaf0885A87D9F3DdF0f08d8B6cc57b68c5f'

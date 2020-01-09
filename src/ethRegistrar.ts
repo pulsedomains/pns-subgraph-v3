@@ -73,7 +73,6 @@ export function handleNameRegisteredByController(event: ControllerNameRegistered
   if(domain.labelName !== event.params.name) {
     domain.labelName = event.params.name
     domain.name = event.params.name + '.eth'
-    domain.isMigrated = true
     domain.save()
   }
 }

@@ -131,11 +131,7 @@ export function handleNewOwner(event: NewOwnerEvent): void {
 }
 
 export function handleNewOwnerOldReigstry(event: NewOwnerEvent): void {
-  let node = event.params.node.toHexString()
-  if(node != ETH_NODE && node != ROOT_NODE ){
-    // Either subdomain or non .eth addresses
-    _handleNewOwner(event, false)
-  }
+  _handleNewOwner(event, false)
 }
 export function handleNewResolverOldReigstry(event: NewResolverEvent): void {
   let domain = Domain.load(event.params.node.toHexString())

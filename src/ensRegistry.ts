@@ -135,26 +135,20 @@ export function handleNewOwnerOldReigstry(event: NewOwnerEvent): void {
 }
 export function handleNewResolverOldReigstry(event: NewResolverEvent): void {
   let domain = Domain.load(event.params.node.toHexString())
-  if(domain){
-    if(domain.isMigrated == false){
-      handleNewResolver(event)
-    }
+  if(domain != null && domain.isMigrated == false){
+    handleNewResolver(event)
   }
 }
 export function handleNewTTLOldReigstry(event: NewTTLEvent): void {
   let domain = Domain.load(event.params.node.toHexString())
-  if(domain){
-    if(domain.isMigrated == false){
-      handleNewTTL(event)
-    }
+  if(domain != null && domain.isMigrated == false){
+    handleNewTTL(event)
   }
 }
 
 export function handleTransferOldReigstry(event: TransferEvent): void {
   let domain = Domain.load(event.params.node.toHexString())
-  if(domain){
-    if(domain.isMigrated == false){
-      handleTransfer(event)
-    }
+  if(domain != null && domain.isMigrated == false){
+    handleTransfer(event)
   }
 }

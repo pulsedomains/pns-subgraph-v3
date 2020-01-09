@@ -1,6 +1,8 @@
 specVersion: 0.0.3
-description: A secure & decentralized way to address resources on and off the blockchain using simple, human-readable names. Access domains and transfer history.
-repository: https://github.com/ensdomains/ens-subgraph
+description: >-
+  A secure & decentralized way to address resources on and off the blockchain
+  using simple, human-readable names. Access domains and transfer history.
+repository: 'https://github.com/ensdomains/ens-subgraph'
 schema:
   file: ./schema.graphql
 dataSources:
@@ -23,13 +25,13 @@ dataSources:
         - name: EnsRegistry
           file: ./abis/Registry.json
       eventHandlers:
-        - event: Transfer(bytes32,address)
+        - event: 'Transfer(indexed bytes32,address)'
           handler: handleTransfer
-        - event: NewOwner(bytes32,bytes32,address)
+        - event: 'NewOwner(indexed bytes32,indexed bytes32,address)'
           handler: handleNewOwner
-        - event: NewResolver(bytes32,address)
+        - event: 'NewResolver(indexed bytes32,address)'
           handler: handleNewResolver
-        - event: NewTTL(bytes32,uint64)
+        - event: 'NewTTL(indexed bytes32,uint64)'
           handler: handleNewTTL
   - kind: ethereum/contract
     name: ENSRegistryOld
@@ -50,13 +52,13 @@ dataSources:
         - name: EnsRegistry
           file: ./abis/Registry.json
       eventHandlers:
-        - event: 'Transfer(bytes32,address)'
+        - event: 'Transfer(indexed bytes32,address)'
           handler: handleTransferOldReigstry
-        - event: 'NewOwner(bytes32,bytes32,address)'
+        - event: 'NewOwner(indexed bytes32,indexed bytes32,address)'
           handler: handleNewOwnerOldReigstry
-        - event: 'NewResolver(bytes32,address)'
+        - event: 'NewResolver(indexed bytes32,address)'
           handler: handleNewResolverOldReigstry
-        - event: 'NewTTL(bytes32,uint64)'
+        - event: 'NewTTL(indexed bytes32,uint64)'
           handler: handleNewTTLOldReigstry
   - kind: ethereum/contract
     name: Resolver
@@ -82,23 +84,23 @@ dataSources:
         - name: Resolver
           file: ./abis/PublicResolver.json
       eventHandlers:
-        - event: ABIChanged(bytes32,uint256)
+        - event: 'ABIChanged(indexed bytes32,indexed uint256)'
           handler: handleABIChanged
-        - event: AddrChanged(bytes32,address)
+        - event: 'AddrChanged(indexed bytes32,address)'
           handler: handleAddrChanged
-        - event: AddressChanged(bytes32,uint256,bytes)
+        - event: 'AddressChanged(indexed bytes32,uint256,bytes)'
           handler: handleMulticoinAddrChanged
-        - event: AuthorisationChanged(bytes32,address,address,bool)
+        - event: 'AuthorisationChanged(indexed bytes32,indexed address,indexed address,bool)'
           handler: handleAuthorisationChanged
-        - event: ContenthashChanged(bytes32,bytes)
+        - event: 'ContenthashChanged(indexed bytes32,bytes)'
           handler: handleContentHashChanged
-        - event: InterfaceChanged(bytes32,bytes4,address)
+        - event: 'InterfaceChanged(indexed bytes32,indexed bytes4,address)'
           handler: handleInterfaceChanged
-        - event: NameChanged(bytes32,string)
+        - event: 'NameChanged(indexed bytes32,string)'
           handler: handleNameChanged
-        - event: PubkeyChanged(bytes32,bytes32,bytes32)
+        - event: 'PubkeyChanged(indexed bytes32,bytes32,bytes32)'
           handler: handlePubkeyChanged
-        - event: TextChanged(bytes32,string,string)
+        - event: 'TextChanged(indexed bytes32,string,string)'
           handler: handleTextChanged
   - kind: ethereum/contract
     name: AuctionRegistrar
@@ -119,15 +121,15 @@ dataSources:
         - name: AuctionRegistrar
           file: ./abis/AuctionRegistrar.json
       eventHandlers:
-        - event: AuctionStarted(bytes32,uint256)
+        - event: 'AuctionStarted(indexed bytes32,uint256)'
           handler: auctionStarted
-        - event: BidRevealed(bytes32,address,uint256,uint8)
+        - event: 'BidRevealed(indexed bytes32,indexed address,uint256,uint8)'
           handler: bidRevealed
-        - event: HashRegistered(bytes32,address,uint256,uint256)
+        - event: 'HashRegistered(indexed bytes32,indexed address,uint256,uint256)'
           handler: hashRegistered
-        - event: HashInvalidated(bytes32,string,uint256,uint256)
+        - event: 'HashInvalidated(indexed bytes32,indexed string,uint256,uint256)'
           handler: hashInvalidated
-        - event: HashReleased(bytes32,uint256)
+        - event: 'HashReleased(indexed bytes32,uint256)'
           handler: hashReleased
   - kind: ethereum/contract
     name: BaseRegistrar
@@ -150,13 +152,13 @@ dataSources:
         - name: BaseRegistrar
           file: ./abis/BaseRegistrar.json
       eventHandlers:
-        - event: NameMigrated(uint256,address,uint256)
+        - event: 'NameMigrated(indexed uint256,indexed address,uint256)'
           handler: handleNameMigrated
-        - event: NameRegistered(uint256,address,uint256)
+        - event: 'NameRegistered(indexed uint256,indexed address,uint256)'
           handler: handleNameRegistered
-        - event: NameRenewed(uint256,uint256)
+        - event: 'NameRenewed(indexed uint256,uint256)'
           handler: handleNameRenewed
-        - event: Transfer(address,address,uint256)
+        - event: 'Transfer(indexed address,indexed address,indexed uint256)'
           handler: handleNameTransferred
   - kind: ethereum/contract
     name: EthRegistrarController
@@ -175,7 +177,7 @@ dataSources:
         - name: EthRegistrarController
           file: ./abis/EthRegistrarController.json
       eventHandlers:
-        - event: NameRegistered(string,bytes32,address,uint256,uint256)
+        - event: 'NameRegistered(string,indexed bytes32,indexed address,uint256,uint256)'
           handler: handleNameRegisteredByController
   - kind: ethereum/contract
     name: Deed

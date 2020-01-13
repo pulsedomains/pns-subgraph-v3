@@ -5,7 +5,7 @@ import {
 } from '@graphprotocol/graph-ts'
 
 import {
-  createEventID, concat, ROOT_NODE, EMPTY_ADDRESS, ETH_NODE
+  createEventID, concat, ROOT_NODE, EMPTY_ADDRESS
 } from './utils'
 
 // Import event types from the registry contract ABI

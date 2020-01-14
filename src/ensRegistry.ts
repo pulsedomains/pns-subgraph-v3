@@ -146,14 +146,14 @@ export function handleNewResolverOldRegistry(event: NewResolverEvent): void {
 }
 export function handleNewTTLOldRegistry(event: NewTTLEvent): void {
   let domain = Domain.load(event.params.node.toHexString())
-  if(domain != null && domain.isMigrated == false){
+  if(domain.isMigrated == false){
     handleNewTTL(event)
   }
 }
 
 export function handleTransferOldRegistry(event: TransferEvent): void {
   let domain = Domain.load(event.params.node.toHexString())
-  if(domain != null && domain.isMigrated == false){
+  if(domain.isMigrated == false){
     handleTransfer(event)
   }
 }

@@ -130,7 +130,7 @@ export function handleNewOwner(event: NewOwnerEvent): void {
   _handleNewOwner(event, true)
 }
 
-export function handleNewOwnerOldReigstry(event: NewOwnerEvent): void {
+export function handleNewOwnerOldRegistry(event: NewOwnerEvent): void {
   let subnode = crypto.keccak256(concat(event.params.node, event.params.label)).toHexString()
   let domain = Domain.load(subnode)
   if(domain == null || domain.isMigrated == false){
@@ -138,20 +138,20 @@ export function handleNewOwnerOldReigstry(event: NewOwnerEvent): void {
   }
 }
 
-export function handleNewResolverOldReigstry(event: NewResolverEvent): void {
+export function handleNewResolverOldRegistry(event: NewResolverEvent): void {
   let domain = Domain.load(event.params.node.toHexString())
   if(domain != null && domain.isMigrated == false){
     handleNewResolver(event)
   }
 }
-export function handleNewTTLOldReigstry(event: NewTTLEvent): void {
+export function handleNewTTLOldRegistry(event: NewTTLEvent): void {
   let domain = Domain.load(event.params.node.toHexString())
   if(domain != null && domain.isMigrated == false){
     handleNewTTL(event)
   }
 }
 
-export function handleTransferOldReigstry(event: TransferEvent): void {
+export function handleTransferOldRegistry(event: TransferEvent): void {
   let domain = Domain.load(event.params.node.toHexString())
   if(domain != null && domain.isMigrated == false){
     handleTransfer(event)

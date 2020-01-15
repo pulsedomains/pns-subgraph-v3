@@ -80,13 +80,14 @@ export function handleTransfer(event: TransferEvent): void {
 }
 
 // Handler for NewResolver events
-export function handleNewResolver(event: NewResolverEvent): void {
+function _handleNewResolver(event: NewResolverEvent, isMigrated:boolean): void {
   let id = event.params.resolver.toHexString().concat('-').concat(event.params.node.toHexString())
 
   let node = event.params.node.toHexString()
   let domain = new Domain(node)
   if(node == ROOT_NODE){
     domain.owner = EMPTY_ADDRESS
+    domain.isMigrated = isMigrated
   }
 
   domain.resolver = id
@@ -138,10 +139,16 @@ export function handleNewOwnerOldRegistry(event: NewOwnerEvent): void {
   }
 }
 
+export function handleNewResolver(event: NewResolverEvent): void {
+  _handleNewResolver(event, true)
+}
+
 export function handleNewResolverOldRegistry(event: NewResolverEvent): void {
-  let domain = Domain.load(event.params.node.toHexString())
-  if(domain != null && domain.isMigrated == false){
-    handleNewResolver(event)
+  let node = event.params.node.toHexString()
+  let domain = Domain.load(node)
+
+  if(node == ROOT_NODE || domain.isMigrated == false){
+    _handleNewResolver(event, false)
   }
 }
 export function handleNewTTLOldRegistry(event: NewTTLEvent): void {

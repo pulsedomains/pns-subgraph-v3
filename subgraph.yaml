@@ -1,11 +1,40 @@
 specVersion: 0.0.3
-description: A secure & decentralized way to address resources on and off the blockchain using simple, human-readable names. Access domains and transfer history.
-repository: https://github.com/ensdomains/ens-subgraph
+description: >-
+  A secure & decentralized way to address resources on and off the blockchain
+  using simple, human-readable names. Access domains and transfer history.
+repository: 'https://github.com/ensdomains/ens-subgraph'
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: ENSRegistry
+    network: mainnet
+    source:
+      address: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e'
+      abi: EnsRegistry
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.2
+      language: wasm/assemblyscript
+      file: ./src/ensRegistry.ts
+      entities:
+        - Domain
+        - Account
+        - Resolver
+      abis:
+        - name: EnsRegistry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: 'Transfer(indexed bytes32,address)'
+          handler: handleTransfer
+        - event: 'NewOwner(indexed bytes32,indexed bytes32,address)'
+          handler: handleNewOwner
+        - event: 'NewResolver(indexed bytes32,address)'
+          handler: handleNewResolver
+        - event: 'NewTTL(indexed bytes32,uint64)'
+          handler: handleNewTTL
+  - kind: ethereum/contract
+    name: ENSRegistryOld
     network: mainnet
     source:
       address: '0x314159265dd8dbb310642f98f50c066173c1259b'
@@ -23,14 +52,14 @@ dataSources:
         - name: EnsRegistry
           file: ./abis/Registry.json
       eventHandlers:
-        - event: Transfer(bytes32,address)
-          handler: handleTransfer
-        - event: NewOwner(bytes32,bytes32,address)
-          handler: handleNewOwner
-        - event: NewResolver(bytes32,address)
-          handler: handleNewResolver
-        - event: NewTTL(bytes32,uint64)
-          handler: handleNewTTL
+        - event: 'Transfer(indexed bytes32,address)'
+          handler: handleTransferOldRegistry
+        - event: 'NewOwner(indexed bytes32,indexed bytes32,address)'
+          handler: handleNewOwnerOldRegistry
+        - event: 'NewResolver(indexed bytes32,address)'
+          handler: handleNewResolverOldRegistry
+        - event: 'NewTTL(indexed bytes32,uint64)'
+          handler: handleNewTTLOldRegistry
   - kind: ethereum/contract
     name: Resolver
     network: mainnet
@@ -55,23 +84,23 @@ dataSources:
         - name: Resolver
           file: ./abis/PublicResolver.json
       eventHandlers:
-        - event: ABIChanged(bytes32,uint256)
+        - event: 'ABIChanged(indexed bytes32,indexed uint256)'
           handler: handleABIChanged
-        - event: AddrChanged(bytes32,address)
+        - event: 'AddrChanged(indexed bytes32,address)'
           handler: handleAddrChanged
-        - event: AddressChanged(bytes32,uint256,bytes)
+        - event: 'AddressChanged(indexed bytes32,uint256,bytes)'
           handler: handleMulticoinAddrChanged
-        - event: AuthorisationChanged(bytes32,address,address,bool)
+        - event: 'AuthorisationChanged(indexed bytes32,indexed address,indexed address,bool)'
           handler: handleAuthorisationChanged
-        - event: ContenthashChanged(bytes32,bytes)
+        - event: 'ContenthashChanged(indexed bytes32,bytes)'
           handler: handleContentHashChanged
-        - event: InterfaceChanged(bytes32,bytes4,address)
+        - event: 'InterfaceChanged(indexed bytes32,indexed bytes4,address)'
           handler: handleInterfaceChanged
-        - event: NameChanged(bytes32,string)
+        - event: 'NameChanged(indexed bytes32,string)'
           handler: handleNameChanged
-        - event: PubkeyChanged(bytes32,bytes32,bytes32)
+        - event: 'PubkeyChanged(indexed bytes32,bytes32,bytes32)'
           handler: handlePubkeyChanged
-        - event: TextChanged(bytes32,string,string)
+        - event: 'TextChanged(indexed bytes32,string,string)'
           handler: handleTextChanged
   - kind: ethereum/contract
     name: AuctionRegistrar
@@ -92,21 +121,21 @@ dataSources:
         - name: AuctionRegistrar
           file: ./abis/AuctionRegistrar.json
       eventHandlers:
-        - event: AuctionStarted(bytes32,uint256)
+        - event: 'AuctionStarted(indexed bytes32,uint256)'
           handler: auctionStarted
-        - event: BidRevealed(bytes32,address,uint256,uint8)
+        - event: 'BidRevealed(indexed bytes32,indexed address,uint256,uint8)'
           handler: bidRevealed
-        - event: HashRegistered(bytes32,address,uint256,uint256)
+        - event: 'HashRegistered(indexed bytes32,indexed address,uint256,uint256)'
           handler: hashRegistered
-        - event: HashInvalidated(bytes32,string,uint256,uint256)
+        - event: 'HashInvalidated(indexed bytes32,indexed string,uint256,uint256)'
           handler: hashInvalidated
-        - event: HashReleased(bytes32,uint256)
+        - event: 'HashReleased(indexed bytes32,uint256)'
           handler: hashReleased
   - kind: ethereum/contract
     name: BaseRegistrar
     network: mainnet
     source:
-      address: '0xfac7bea255a6990f749363002136af6556b31e04'
+      address: '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85'
       abi: BaseRegistrar
     mapping:
       kind: ethereum/events
@@ -123,19 +152,19 @@ dataSources:
         - name: BaseRegistrar
           file: ./abis/BaseRegistrar.json
       eventHandlers:
-        - event: NameMigrated(uint256,address,uint256)
+        - event: 'NameMigrated(indexed uint256,indexed address,uint256)'
           handler: handleNameMigrated
-        - event: NameRegistered(uint256,address,uint256)
+        - event: 'NameRegistered(indexed uint256,indexed address,uint256)'
           handler: handleNameRegistered
-        - event: NameRenewed(uint256,uint256)
+        - event: 'NameRenewed(indexed uint256,uint256)'
           handler: handleNameRenewed
-        - event: Transfer(address,address,uint256)
+        - event: 'Transfer(indexed address,indexed address,indexed uint256)'
           handler: handleNameTransferred
   - kind: ethereum/contract
     name: EthRegistrarController
     network: mainnet
     source:
-      address: '0xfac7bea255a6990f749363002136af6556b31e04'
+      address: '0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5'
       abi: EthRegistrarController
     mapping:
       kind: ethereum/events
@@ -148,7 +177,7 @@ dataSources:
         - name: EthRegistrarController
           file: ./abis/EthRegistrarController.json
       eventHandlers:
-        - event: NameRegistered(string,bytes32,address,uint256,uint256)
+        - event: 'NameRegistered(string,indexed bytes32,indexed address,uint256,uint256)'
           handler: handleNameRegisteredByController
   - kind: ethereum/contract
     name: Deed

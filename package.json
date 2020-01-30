@@ -1,6 +1,6 @@
 {
   "name": "ens-subgraph",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "repository": "https://github.com/ensdomains/ens-subgraph",
   "license": "MIT",
   "scripts": {
@@ -14,7 +14,8 @@
     "watch-local": "graph deploy graphprotocol/ens --watch --debug --node http://127.0.0.1:8020/ --ipfs http://localhost:5001"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "^0.11.2",
-    "@graphprotocol/graph-ts": "^0.15.1"
-  }
+    "@graphprotocol/graph-cli": "^0.17.1",
+    "@graphprotocol/graph-ts": "^0.17.0"
+  },
+  "dependencies": {}
 }

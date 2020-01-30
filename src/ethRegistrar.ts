@@ -1,7 +1,7 @@
 // Import types and APIs from graph-ts
 import {
   ByteArray,
-  crypto,
+  crypto
 } from '@graphprotocol/graph-ts'
 
 import {

@@ -68,6 +68,9 @@ export function handleTransfer(event: TransferEvent): void {
 
   // Update the domain owner
   let domain = new Domain(node)
+  if(node == ROOT_NODE){
+    domain.isMigrated = true
+  }
   domain.owner = account.id
   domain.save()
 

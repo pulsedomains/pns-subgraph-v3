@@ -17,7 +17,8 @@ import {
 } from './types/BaseRegistrar/BaseRegistrar'
 
 import {
-  NameRegistered as ControllerNameRegisteredEvent
+  NameRegistered as ControllerNameRegisteredEvent,
+  NameRenewed as ControllerNameRenewedEvent
 } from './types/EthRegistrarController/EthRegistrarController'
 
 // Import entity types generated from the GraphQL schema
@@ -53,6 +54,23 @@ export function handleNameRegisteredByController(event: ControllerNameRegistered
     domain.name = event.params.name + '.eth'
     domain.save()
   }
+
+  let registration = Registration.load(event.params.label.toHex());
+  if(registration == null) return
+  registration.labelName = event.params.name
+}
+
+export function handleNameRenewedByController(event: ControllerNameRenewedEvent): void {
+  let domain = new Domain(crypto.keccak256(concat(rootNode, event.params.label)).toHex())
+  if(domain.labelName !== event.params.name) {
+    domain.labelName = event.params.name
+    domain.name = event.params.name + '.eth'
+    domain.save()
+  }
+
+  let registration = Registration.load(event.params.label.toHex());
+  if(registration == null) return
+  registration.labelName = event.params.name
 }
 
 export function handleNameRenewed(event: NameRenewedEvent): void {

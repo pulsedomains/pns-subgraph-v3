@@ -64,6 +64,7 @@ type Registration @entity {
   registrationDate: BigInt!
   expiryDate: BigInt!
   registrant: Account!
+  labelName: String
 }
 
 interface RegistrationEvent {

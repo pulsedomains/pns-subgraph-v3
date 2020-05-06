@@ -70,18 +70,20 @@ export function handleNameRenewed(event: NameRenewedEvent): void {
 }
 
 export function handleNameTransferred(event: TransferEvent): void {
+  let account = new Account(event.params.to.toHex())
+  account.save()
+
   let label = uint256ToByteArray(event.params.tokenId)
-  let registrant = event.params.to.toHex()
   let registration = Registration.load(label.toHex())
   if(registration == null) return;
 
-  registration.registrant = registrant
+  registration.registrant = account.id
   registration.save()
 
   let transferEvent = new NameTransferred(createEventID(event))
   transferEvent.registration = label.toHex()
   transferEvent.blockNumber = event.block.number.toI32()
   transferEvent.transactionID = event.transaction.hash
-  transferEvent.newOwner = registrant
+  transferEvent.newOwner = account.id
   transferEvent.save()
 }

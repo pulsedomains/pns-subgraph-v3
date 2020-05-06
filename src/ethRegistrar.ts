@@ -21,7 +21,7 @@ import {
 } from './types/EthRegistrarController/EthRegistrarController'
 
 // Import entity types generated from the GraphQL schema
-import { Account, AuctionedName, Domain, Registration, NameRegistered, NameRenewed, NameTransferred } from './types/schema'
+import { Account, Domain, Registration, NameRegistered, NameRenewed, NameTransferred } from './types/schema'
 
 var rootNode:ByteArray = byteArrayFromHex("93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae")
 

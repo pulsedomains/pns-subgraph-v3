@@ -55,33 +55,7 @@ type NewTTL implements DomainEvent @entity {
 type Account @entity {
   id: ID!
   domains: [Domain!]! @derivedFrom(field: "owner")
-  deeds: [Deed!]! @derivedFrom(field: "owner")
   registrations: [Registration!] @derivedFrom(field: "registrant")
-}
-
-enum AuctionState {
-  AUCTION
-  FINALIZED
-  RELEASED
-  FORBIDDEN
-}
-
-type Deed @entity {
-  id: ID!
-  owner: Account!
-  value: BigInt!
-  name: AuctionedName @derivedFrom(field: "deed")
-}
-
-type AuctionedName @entity {
-  id: ID!
-  domain: Domain
-  registrationDate: BigInt!
-  releaseDate: BigInt
-  deed: Deed
-  secondBid: BigInt
-  bidCount: Int!
-  state: AuctionState!
 }
 
 type Registration @entity {

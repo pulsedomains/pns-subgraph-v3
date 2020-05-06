@@ -1,7 +1,8 @@
 // Import types and APIs from graph-ts
 import {
   ByteArray,
-  crypto
+  crypto,
+  ens
 } from '@graphprotocol/graph-ts'
 
 import {
@@ -36,6 +37,11 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
   registration.registrationDate = event.block.timestamp
   registration.expiryDate = event.params.expires
   registration.registrant = account.id
+
+  let labelName = ens.nameByHash(label.toHexString())
+  if (labelName != null) {
+    registration.labelName = labelName
+  }
   registration.save()
 
   let registrationEvent = new NameRegistered(createEventID(event))

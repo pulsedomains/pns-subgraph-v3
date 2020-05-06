@@ -99,15 +99,6 @@ interface RegistrationEvent {
   transactionID: Bytes!
 }
 
-type NameMigrated implements RegistrationEvent @entity {
-  id: ID!
-  registration: Registration!
-  blockNumber: Int!
-  transactionID: Bytes!
-  registrant: Account!
-  expiryDate: BigInt!
-}
-
 type NameRegistered implements RegistrationEvent @entity {
   id: ID!
   registration: Registration!

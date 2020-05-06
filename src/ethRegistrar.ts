@@ -11,7 +11,6 @@ import {
 
 // Import event types from the registry contract ABI
 import {
-  NameMigrated as NameMigratedEvent,
   NameRegistered as NameRegisteredEvent,
   NameRenewed as NameRenewedEvent,
   Transfer as TransferEvent,
@@ -22,30 +21,9 @@ import {
 } from './types/EthRegistrarController/EthRegistrarController'
 
 // Import entity types generated from the GraphQL schema
-import { Account, AuctionedName, Domain, Registration, NameMigrated, NameRegistered, NameRenewed, NameTransferred } from './types/schema'
+import { Account, AuctionedName, Domain, Registration, NameRegistered, NameRenewed, NameTransferred } from './types/schema'
 
 var rootNode:ByteArray = byteArrayFromHex("93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae")
-
-export function handleNameMigrated(event: NameMigratedEvent): void {
-  let label = uint256ToByteArray(event.params.id)
-
-  let auctionedName = AuctionedName.load(label.toHex())
-
-  let registration = new Registration(label.toHex())
-  registration.domain = crypto.keccak256(concat(rootNode, label)).toHex();
-  registration.registrationDate = auctionedName.registrationDate
-  registration.expiryDate = event.params.expires
-  registration.registrant = event.params.owner.toHex()
-  registration.save()
-
-  let registrationEvent = new NameMigrated(createEventID(event))
-  registrationEvent.registration = registration.id
-  registrationEvent.blockNumber = event.block.number.toI32()
-  registrationEvent.transactionID = event.transaction.hash
-  registrationEvent.registrant = event.params.owner.toHex()
-  registrationEvent.expiryDate = event.params.expires
-  registrationEvent.save()
-}
 
 export function handleNameRegistered(event: NameRegisteredEvent): void {
   let account = new Account(event.params.owner.toHex())

@@ -145,15 +145,12 @@ dataSources:
       entities:
         - Registration
         - NameRegistered
-        - NameMigrated
         - NameRenewed
         - NameTransferred
       abis:
         - name: BaseRegistrar
           file: ./abis/BaseRegistrar.json
       eventHandlers:
-        - event: 'NameMigrated(indexed uint256,indexed address,uint256)'
-          handler: handleNameMigrated
         - event: 'NameRegistered(indexed uint256,indexed address,uint256)'
           handler: handleNameRegistered
         - event: 'NameRenewed(indexed uint256,uint256)'

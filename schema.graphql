@@ -106,6 +106,7 @@ type Resolver @entity {
   address: Bytes!           # Address of resolver contract
 
   addr: Account             # Current value of addr record (per events)
+  contentHash: Bytes        # Content hash, in binary format.
   texts: [String!]          # Set of observed text record keys
   coinTypes: [Int!]         # Set of observed SLIP-44 coin types
   events: [ResolverEvent!]! @derivedFrom(field: "resolver")

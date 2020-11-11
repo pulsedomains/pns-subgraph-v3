@@ -133,6 +133,10 @@ export function handleTextChanged(event: TextChangedEvent): void {
 }
 
 export function handleContentHashChanged(event: ContenthashChangedEvent): void {
+  let resolver = getOrCreateResolver(event.params.node, event.address)
+  resolver.contentHash = event.params.hash
+  resolver.save()
+  
   let resolverEvent = new ContenthashChanged(createEventID(event))
   resolverEvent.resolver = createResolverID(event.params.node, event.address)
   resolverEvent.blockNumber = event.block.number.toI32()

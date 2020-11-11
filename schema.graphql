@@ -65,6 +65,7 @@ type Registration @entity {
   expiryDate: BigInt!
   registrant: Account!
   labelName: String
+  events: [RegistrationEvent!]! @derivedFrom(field: "registration")
 }
 
 interface RegistrationEvent {

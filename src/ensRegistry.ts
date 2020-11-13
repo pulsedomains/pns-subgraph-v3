@@ -160,7 +160,7 @@ export function handleNewResolverOldRegistry(event: NewResolverEvent): void {
   let node = event.params.node.toHexString()
   let domain = getDomain(node)
 
-  if(node == ROOT_NODE || domain.isMigrated == false){
+  if(node == ROOT_NODE || !domain.isMigrated){
     handleNewResolver(event)
   }
 }

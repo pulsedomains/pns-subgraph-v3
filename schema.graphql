@@ -102,7 +102,7 @@ type NameTransferred implements RegistrationEvent @entity {
 
 type Resolver @entity {
   id: ID!                   # Concatenation of resolver address and namehash
-  domain: Domain!
+  domain: Domain
   address: Bytes!           # Address of resolver contract
 
   addr: Account             # Current value of addr record (per events)

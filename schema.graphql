@@ -30,6 +30,7 @@ type Transfer implements DomainEvent @entity {
 
 type NewOwner implements DomainEvent @entity {
   id: ID!
+  parentDomain: Domain!
   domain: Domain!
   blockNumber: Int!
   transactionID: Bytes!

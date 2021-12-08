@@ -25,9 +25,7 @@ import {
   TextChanged,
 } from './types/schema'
 
-import { Bytes, BigInt, Address, EthereumEvent } from "@graphprotocol/graph-ts";
-
-import { log } from '@graphprotocol/graph-ts'
+import { Bytes, Address, ethereum } from "@graphprotocol/graph-ts";
 
 export function handleAddrChanged(event: AddrChangedEvent): void {
   let account = new Account(event.params.a.toHexString())
@@ -40,7 +38,7 @@ export function handleAddrChanged(event: AddrChangedEvent): void {
   resolver.save()
 
   let domain = Domain.load(event.params.node.toHexString())
-  if(domain.resolver == resolver.id) {
+  if(domain && domain.resolver == resolver.id) {
     domain.resolvedAddress = event.params.a.toHexString()
     domain.save()
   }
@@ -60,11 +58,13 @@ export function handleMulticoinAddrChanged(event: AddressChangedEvent): void {
   if(resolver.coinTypes == null) {
     resolver.coinTypes = [coinType];
     resolver.save();
-  } else if(!resolver.coinTypes.includes(coinType)) {
-    let coinTypes = resolver.coinTypes
-    coinTypes.push(coinType)
-    resolver.coinTypes = coinTypes
-    resolver.save()
+  } else {
+    let coinTypes = resolver.coinTypes!
+    if(!coinTypes.includes(coinType)){
+      coinTypes.push(coinType)
+      resolver.coinTypes = coinTypes
+      resolver.save()
+    }
   }
 
   let resolverEvent = new MulticoinAddrChanged(createEventID(event))
@@ -112,11 +112,13 @@ export function handleTextChanged(event: TextChangedEvent): void {
   if(resolver.texts == null) {
     resolver.texts = [key];
     resolver.save();
-  } else if(!resolver.texts.includes(key)) {
-    let texts = resolver.texts
-    texts.push(key)
-    resolver.texts = texts
-    resolver.save()
+  } else {
+    let texts = resolver.texts!
+    if(!texts.includes(key)){
+      texts.push(key)
+      resolver.texts = texts
+      resolver.save()
+    }
   }
 
   let resolverEvent = new TextChanged(createEventID(event))
@@ -172,7 +174,7 @@ function getOrCreateResolver(node: Bytes, address: Address): Resolver {
   return resolver as Resolver
 }
 
-function createEventID(event: EthereumEvent): string {
+function createEventID(event: ethereum.Event): string {
   return event.block.number.toString().concat('-').concat(event.logIndex.toString())
 }
 

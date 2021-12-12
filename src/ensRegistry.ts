@@ -29,7 +29,6 @@ function createDomain(node: string, timestamp: BigInt): Domain {
     domain.owner = EMPTY_ADDRESS
     domain.isMigrated = true
     domain.createdAt = timestamp
-    domain.save()
   }
   return domain
 }
@@ -80,7 +79,7 @@ function _handleNewOwner(event: NewOwnerEvent, isMigrated: boolean): void {
     }
   }
 
-  domain.owner = account.id
+  domain.owner = event.params.owner.toHexString()
   domain.parent = event.params.node.toHexString()
   domain.labelhash = event.params.label
   domain.isMigrated = isMigrated
@@ -90,8 +89,8 @@ function _handleNewOwner(event: NewOwnerEvent, isMigrated: boolean): void {
   domainEvent.blockNumber = event.block.number.toI32()
   domainEvent.transactionID = event.transaction.hash
   domainEvent.parentDomain = event.params.node.toHexString()
-  domainEvent.domain = domain.id
-  domainEvent.owner = account.id
+  domainEvent.domain = subnode
+  domainEvent.owner = event.params.owner.toHexString()
   domainEvent.save()
 }
 
@@ -104,14 +103,14 @@ export function handleTransfer(event: TransferEvent): void {
 
   // Update the domain owner
   let domain = getDomain(node)!
-  domain.owner = account.id
+  domain.owner = event.params.owner.toHexString()
   domain.save()
 
   let domainEvent = new Transfer(createEventID(event))
   domainEvent.blockNumber = event.block.number.toI32()
   domainEvent.transactionID = event.transaction.hash
   domainEvent.domain = node
-  domainEvent.owner = account.id
+  domainEvent.owner = event.params.owner.toHexString()
   domainEvent.save()
 }
 

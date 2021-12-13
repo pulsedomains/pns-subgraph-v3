@@ -54,7 +54,7 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
 }
 
 export function handleNameRegisteredByController(event: ControllerNameRegisteredEvent): void {
-  let domain = new Domain(crypto.keccak256(concat(rootNode, event.params.label)).toHex())
+  let domain = Domain.load(crypto.keccak256(concat(rootNode, event.params.label)).toHex())!
   if(domain.labelName !== event.params.name) {
     domain.labelName = event.params.name
     domain.name = event.params.name + '.eth'
@@ -69,7 +69,7 @@ export function handleNameRegisteredByController(event: ControllerNameRegistered
 }
 
 export function handleNameRenewedByController(event: ControllerNameRenewedEvent): void {
-  let domain = new Domain(crypto.keccak256(concat(rootNode, event.params.label)).toHex())
+  let domain = Domain.load(crypto.keccak256(concat(rootNode, event.params.label)).toHex())!
   if(domain.labelName !== event.params.name) {
     domain.labelName = event.params.name
     domain.name = event.params.name + '.eth'

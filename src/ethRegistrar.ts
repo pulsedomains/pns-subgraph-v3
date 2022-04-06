@@ -1,8 +1,11 @@
 // Import types and APIs from graph-ts
 import {
+  BigInt,
   ByteArray,
+  Bytes,
   crypto,
-  ens
+  ens,
+  log
 } from '@graphprotocol/graph-ts'
 
 import {
@@ -54,32 +57,34 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
 }
 
 export function handleNameRegisteredByController(event: ControllerNameRegisteredEvent): void {
-  let domain = Domain.load(crypto.keccak256(concat(rootNode, event.params.label)).toHex())!
-  if(domain.labelName !== event.params.name) {
-    domain.labelName = event.params.name
-    domain.name = event.params.name + '.eth'
-    domain.save()
-  }
-
-  let registration = Registration.load(event.params.label.toHex());
-  if(registration == null) return
-  registration.labelName = event.params.name
-  registration.cost = event.params.cost
-  registration.save()
+  setNamePreimage(event.params.name, event.params.label, event.params.cost);
 }
 
-export function handleNameRenewedByController(event: ControllerNameRenewedEvent): void {
-  let domain = Domain.load(crypto.keccak256(concat(rootNode, event.params.label)).toHex())!
-  if(domain.labelName !== event.params.name) {
-    domain.labelName = event.params.name
-    domain.name = event.params.name + '.eth'
+function handleNameRenewedByController(event: ControllerNameRenewedEvent): void {
+  setNamePreimage(event.params.name, event.params.label, event.params.cost);
+}
+
+function setNamePreimage(name: string, label: Bytes, cost: BigInt): void {
+  const labelHash = crypto.keccak256(ByteArray.fromUTF8(name));
+  if(labelHash !== label) {
+    log.warning(
+      "Expected '{}' to hash to {}, but got {} instead. Skipping.",
+      [name, labelHash.toHex(), label.toHex()]
+    );
+    return;
+  }
+
+  let domain = Domain.load(crypto.keccak256(concat(rootNode, label)).toHex())!
+  if(domain.labelName !== name) {
+    domain.labelName = name
+    domain.name = name + '.eth'
     domain.save()
   }
 
-  let registration = Registration.load(event.params.label.toHex());
+  let registration = Registration.load(label.toHex());
   if(registration == null) return
-  registration.labelName = event.params.name
-  registration.cost = event.params.cost
+  registration.labelName = name
+  registration.cost = cost
   registration.save()
 }
 

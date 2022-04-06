@@ -66,11 +66,16 @@ export function handleNameRenewedByController(event: ControllerNameRenewedEvent)
 
 function setNamePreimage(name: string, label: Bytes, cost: BigInt): void {
   const labelHash = crypto.keccak256(ByteArray.fromUTF8(name));
-  if(labelHash !== label) {
+  if(!labelHash.equals(label)) {
     log.warning(
       "Expected '{}' to hash to {}, but got {} instead. Skipping.",
       [name, labelHash.toHex(), label.toHex()]
     );
+    return;
+  }
+
+  if(name.indexOf(".") !== -1) {
+    log.warning("Invalid label '{}'. Skipping.", [name]);
     return;
   }
 

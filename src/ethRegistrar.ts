@@ -60,7 +60,7 @@ export function handleNameRegisteredByController(event: ControllerNameRegistered
   setNamePreimage(event.params.name, event.params.label, event.params.cost);
 }
 
-function handleNameRenewedByController(event: ControllerNameRenewedEvent): void {
+export function handleNameRenewedByController(event: ControllerNameRenewedEvent): void {
   setNamePreimage(event.params.name, event.params.label, event.params.cost);
 }
 

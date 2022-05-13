@@ -22,7 +22,6 @@ import {
 import { Account, Domain, Resolver, NewOwner, Transfer, NewResolver, NewTTL } from './types/schema'
 
 const BIG_INT_ZERO = BigInt.fromI32(0)
-const BIG_INT_ONE = BigInt.fromI32(1)
 
 function createDomain(node: string, timestamp: BigInt): Domain {
   let domain = new Domain(node)
@@ -31,7 +30,7 @@ function createDomain(node: string, timestamp: BigInt): Domain {
     domain.owner = EMPTY_ADDRESS
     domain.isMigrated = true
     domain.createdAt = timestamp
-    domain.subdomainCount = BIG_INT_ZERO
+    domain.subdomainCount = 0
   }
   return domain
 }
@@ -61,14 +60,14 @@ function _handleNewOwner(event: NewOwnerEvent, isMigrated: boolean): void {
   if (domain === null) {
     domain = new Domain(subnode)
     domain.createdAt = event.block.timestamp
-    domain.subdomainCount = BIG_INT_ZERO
+    domain.subdomainCount = 0
   }
 
   if (domain.parent === null && parent !== null) {
     if (event.params.owner.toHexString() != EMPTY_ADDRESS) {
-      parent.subdomainCount = parent.subdomainCount.plus(BIG_INT_ONE)
+      parent.subdomainCount = parent.subdomainCount + 1
     } else {
-      parent.subdomainCount = parent.subdomainCount.minus(BIG_INT_ONE)
+      parent.subdomainCount = parent.subdomainCount - 1
     }
     parent.save()
   }
@@ -121,9 +120,8 @@ export function handleTransfer(event: TransferEvent): void {
 
   if (event.params.owner.toHexString() === EMPTY_ADDRESS) {
     let parent = getDomain(domain.parent!)!
-    parent.subdomainCount = parent.subdomainCount.minus(BIG_INT_ONE)
+    parent.subdomainCount = parent.subdomainCount - 1
     parent.save()
-    domain.parent = null
   }
 
   domain.owner = event.params.owner.toHexString()

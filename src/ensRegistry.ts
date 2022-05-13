@@ -2,7 +2,8 @@
 import {
   BigInt,
   crypto,
-  ens
+  ens,
+  log
 } from '@graphprotocol/graph-ts'
 
 import {
@@ -21,6 +22,7 @@ import {
 import { Account, Domain, Resolver, NewOwner, Transfer, NewResolver, NewTTL } from './types/schema'
 
 const BIG_INT_ZERO = BigInt.fromI32(0)
+const BIG_INT_ONE = BigInt.fromI32(1)
 
 function createDomain(node: string, timestamp: BigInt): Domain {
   let domain = new Domain(node)
@@ -29,6 +31,7 @@ function createDomain(node: string, timestamp: BigInt): Domain {
     domain.owner = EMPTY_ADDRESS
     domain.isMigrated = true
     domain.createdAt = timestamp
+    domain.subdomainCount = BIG_INT_ZERO
   }
   return domain
 }
@@ -53,9 +56,21 @@ function _handleNewOwner(event: NewOwnerEvent, isMigrated: boolean): void {
 
   let subnode = makeSubnode(event)
   let domain = getDomain(subnode, event.block.timestamp);
-  if(domain === null) {
+  let parent = getDomain(event.params.node.toHexString())
+
+  if (domain === null) {
     domain = new Domain(subnode)
     domain.createdAt = event.block.timestamp
+    domain.subdomainCount = BIG_INT_ZERO
+  }
+
+  if (domain.parent === null && parent !== null) {
+    if (event.params.owner.toHexString() != EMPTY_ADDRESS) {
+      parent.subdomainCount = parent.subdomainCount.plus(BIG_INT_ONE)
+    } else {
+      parent.subdomainCount = parent.subdomainCount.minus(BIG_INT_ONE)
+    }
+    parent.save()
   }
 
   if(domain.name == null) {
@@ -71,7 +86,7 @@ function _handleNewOwner(event: NewOwnerEvent, isMigrated: boolean): void {
     if(event.params.node.toHexString() == '0x0000000000000000000000000000000000000000000000000000000000000000') {
       domain.name = label
     } else {
-      let parent = Domain.load(event.params.node.toHexString())!
+      parent = parent!
       let name = parent.name
       if (label && name ) {
         domain.name = label + '.'  + name
@@ -103,6 +118,14 @@ export function handleTransfer(event: TransferEvent): void {
 
   // Update the domain owner
   let domain = getDomain(node)!
+
+  if (event.params.owner.toHexString() === EMPTY_ADDRESS) {
+    let parent = getDomain(domain.parent!)!
+    parent.subdomainCount = parent.subdomainCount.minus(BIG_INT_ONE)
+    parent.save()
+    domain.parent = null
+  }
+
   domain.owner = event.params.owner.toHexString()
   domain.save()
 

@@ -3,7 +3,8 @@ import {
   BigInt,
   crypto,
   ens,
-  log
+  log,
+  store
 } from '@graphprotocol/graph-ts'
 
 import {
@@ -48,6 +49,32 @@ function makeSubnode(event:NewOwnerEvent): string {
   return crypto.keccak256(concat(event.params.node, event.params.label)).toHexString()
 }
 
+function recurseDomainDelete(domain: Domain): string {
+  if (domain.parent !== null) {
+    const parentDomain = Domain.load(domain.parent!)
+    let resolverIsNull = false
+    if (domain.resolver !== null) {
+      const resolver = Resolver.load(domain.resolver!)!
+      resolverIsNull = resolver.address.toHexString() == EMPTY_ADDRESS
+    } else {
+      resolverIsNull = true
+    }
+
+    if (
+      domain.owner == EMPTY_ADDRESS 
+      && resolverIsNull
+      && domain.subdomainCount === 0
+      && parentDomain !== null
+    ) {
+      store.remove('Domain', domain.id)
+      parentDomain.subdomainCount = parentDomain.subdomainCount - 1
+      parentDomain.save()
+      return recurseDomainDelete(parentDomain)
+    }
+  }
+  return domain.id
+}
+
 // Handler for NewOwner events
 function _handleNewOwner(event: NewOwnerEvent, isMigrated: boolean): void {
   let account = new Account(event.params.owner.toHexString())
@@ -64,11 +91,7 @@ function _handleNewOwner(event: NewOwnerEvent, isMigrated: boolean): void {
   }
 
   if (domain.parent === null && parent !== null) {
-    if (event.params.owner.toHexString() != EMPTY_ADDRESS) {
-      parent.subdomainCount = parent.subdomainCount + 1
-    } else {
-      parent.subdomainCount = parent.subdomainCount - 1
-    }
+    parent.subdomainCount = parent.subdomainCount + 1
     parent.save()
   }
 
@@ -97,7 +120,9 @@ function _handleNewOwner(event: NewOwnerEvent, isMigrated: boolean): void {
   domain.parent = event.params.node.toHexString()
   domain.labelhash = event.params.label
   domain.isMigrated = isMigrated
-  domain.save()
+  if (recurseDomainDelete(domain) === domain.id) {
+    domain.save()
+  }
 
   let domainEvent = new NewOwner(createEventID(event))
   domainEvent.blockNumber = event.block.number.toI32()
@@ -118,14 +143,10 @@ export function handleTransfer(event: TransferEvent): void {
   // Update the domain owner
   let domain = getDomain(node)!
 
-  if (event.params.owner.toHexString() === EMPTY_ADDRESS) {
-    let parent = getDomain(domain.parent!)!
-    parent.subdomainCount = parent.subdomainCount - 1
-    parent.save()
-  }
-
   domain.owner = event.params.owner.toHexString()
-  domain.save()
+  if (recurseDomainDelete(domain) === domain.id) {
+    domain.save()
+  }
 
   let domainEvent = new Transfer(createEventID(event))
   domainEvent.blockNumber = event.block.number.toI32()
@@ -152,7 +173,9 @@ export function handleNewResolver(event: NewResolverEvent): void {
   } else {
     domain.resolvedAddress = resolver.addr
   }
-  domain.save()
+  if (recurseDomainDelete(domain) === domain.id) {
+    domain.save()
+  }
 
   let domainEvent = new NewResolver(createEventID(event))
   domainEvent.blockNumber = event.block.number.toI32()

@@ -1,3 +1,5 @@
+import { Address, ByteArray, Bytes, ethereum, Value } from "@graphprotocol/graph-ts";
+import { Resolver as ResolverContract } from "./types/Resolver/Resolver";
 import {
   ABIChanged as ABIChangedEvent,
   AddrChanged as AddrChangedEvent,
@@ -7,25 +9,14 @@ import {
   InterfaceChanged as InterfaceChangedEvent,
   NameChanged as NameChangedEvent,
   PubkeyChanged as PubkeyChangedEvent,
-  TextChanged as TextChangedEvent,
-} from './types/Resolver/Resolver'
-
+  TextChanged as TextChangedEvent
+} from './types/Resolver/Resolver';
 import {
-  Account,
-  Domain,
-  Resolver,
-  AddrChanged,
-  MulticoinAddrChanged,
-  NameChanged,
-  AbiChanged,
-  PubkeyChanged,
-  ContenthashChanged,
-  InterfaceChanged,
-  AuthorisationChanged,
-  TextChanged,
-} from './types/schema'
+  AbiChanged, Account, AddrChanged, AuthorisationChanged, ContenthashChanged, Domain, InterfaceChanged, MulticoinAddrChanged,
+  NameChanged, PubkeyChanged, Resolver, TextChanged
+} from './types/schema';
 
-import { Bytes, Address, ethereum } from "@graphprotocol/graph-ts";
+
 
 export function handleAddrChanged(event: AddrChangedEvent): void {
   let account = new Account(event.params.a.toHexString())
@@ -108,6 +99,9 @@ export function handlePubkeyChanged(event: PubkeyChangedEvent): void {
 
 export function handleTextChanged(event: TextChangedEvent): void {
   let resolver = getOrCreateResolver(event.params.node, event.address)
+  let contract = ResolverContract.bind(event.address)
+  let value = contract.try_text(event.params.node, event.params.key)
+
   let key = event.params.key;
   if(resolver.texts == null) {
     resolver.texts = [key];
@@ -126,6 +120,7 @@ export function handleTextChanged(event: TextChangedEvent): void {
   resolverEvent.blockNumber = event.block.number.toI32()
   resolverEvent.transactionID = event.transaction.hash
   resolverEvent.key = event.params.key
+  resolverEvent.value = value.value
   resolverEvent.save()
 }
 

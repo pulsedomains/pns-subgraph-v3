@@ -3,7 +3,6 @@ import {
   BigInt,
   crypto,
   ens,
-  store
 } from '@graphprotocol/graph-ts'
 
 import {
@@ -55,8 +54,6 @@ function recurseDomainDelete(domain: Domain): string | null {
     domain.owner == EMPTY_ADDRESS &&
     domain.subdomainCount == 0
   ) {
-    store.remove("Domain", domain.id)
-
     const parentDomain = Domain.load(domain.parent!)
     if (parentDomain != null) {
       parentDomain.subdomainCount = parentDomain.subdomainCount - 1
@@ -71,9 +68,8 @@ function recurseDomainDelete(domain: Domain): string | null {
 }
 
 function saveDomain(domain: Domain): void {
-  if (recurseDomainDelete(domain) === domain.id) {
-    domain.save()
-  }
+  recurseDomainDelete(domain)
+  domain.save()
 }
 
 // Handler for NewOwner events

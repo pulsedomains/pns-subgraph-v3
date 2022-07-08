@@ -12,6 +12,7 @@ type Domain @entity {
   ttl: BigInt
   isMigrated: Boolean!
   createdAt: BigInt!
+  fuses: BigInt
   events: [DomainEvent!]! @derivedFrom(field: "domain")
 }
 
@@ -20,6 +21,32 @@ interface DomainEvent {
   domain: Domain!
   blockNumber: Int!
   transactionID: Bytes!
+}
+
+type NameWrapped implements DomainEvent @entity  {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
+  name: String!
+  fuses: BigInt!
+  owner: Account!
+}
+
+type NameUnwrapped implements DomainEvent @entity  {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
+  owner: Account!
+}
+
+type FusesSet implements DomainEvent @entity  {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
+  fuses: BigInt! 
 }
 
 type Transfer implements DomainEvent @entity {

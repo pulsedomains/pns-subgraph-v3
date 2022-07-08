@@ -8,17 +8,18 @@ import {
   log
 } from '@graphprotocol/graph-ts'
 
-import {
-  createEventID, ROOT_NODE, EMPTY_ADDRESS,
-  uint256ToByteArray, byteArrayFromHex, concat
-} from './utils'
+import { byteArrayFromHex, concat, createEventID, uint256ToByteArray } from './utils'
 
 // Import event types from the registry contract ABI
 import {
   NameRegistered as NameRegisteredEvent,
   NameRenewed as NameRenewedEvent,
-  Transfer as TransferEvent,
+  Transfer as TransferEvent
 } from './types/BaseRegistrar/BaseRegistrar'
+
+import {
+  NameRegistered as ControllerNameRegisteredEventOld,
+} from './types/EthRegistrarControllerOld/EthRegistrarControllerOld'
 
 import {
   NameRegistered as ControllerNameRegisteredEvent,
@@ -26,7 +27,7 @@ import {
 } from './types/EthRegistrarController/EthRegistrarController'
 
 // Import entity types generated from the GraphQL schema
-import { Account, Domain, Registration, NameRegistered, NameRenewed, NameTransferred } from './types/schema'
+import { Account, Domain, NameRegistered, NameRenewed, NameTransferred, Registration } from './types/schema'
 
 var rootNode:ByteArray = byteArrayFromHex("93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae")
 
@@ -56,8 +57,12 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
   registrationEvent.save()
 }
 
-export function handleNameRegisteredByController(event: ControllerNameRegisteredEvent): void {
+export function handleNameRegisteredByControllerOld(event: ControllerNameRegisteredEventOld): void {
   setNamePreimage(event.params.name, event.params.label, event.params.cost);
+}
+
+export function handleNameRegisteredByController(event: ControllerNameRegisteredEvent): void {
+  setNamePreimage(event.params.name, event.params.label, event.params.baseCost.plus(event.params.premium))
 }
 
 export function handleNameRenewedByController(event: ControllerNameRenewedEvent): void {

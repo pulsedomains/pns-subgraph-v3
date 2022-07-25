@@ -2,7 +2,7 @@
 import {
   BigInt,
   crypto,
-  ens
+  ens,
 } from '@graphprotocol/graph-ts'
 
 import {
@@ -29,6 +29,7 @@ function createDomain(node: string, timestamp: BigInt): Domain {
     domain.owner = EMPTY_ADDRESS
     domain.isMigrated = true
     domain.createdAt = timestamp
+    domain.subdomainCount = 0
   }
   return domain
 }
@@ -46,6 +47,31 @@ function makeSubnode(event:NewOwnerEvent): string {
   return crypto.keccak256(concat(event.params.node, event.params.label)).toHexString()
 }
 
+function recurseDomainDelete(domain: Domain): string | null {
+  if (
+    (domain.resolver == null ||
+      domain.resolver!.split("-")[0] == EMPTY_ADDRESS) &&
+    domain.owner == EMPTY_ADDRESS &&
+    domain.subdomainCount == 0
+  ) {
+    const parentDomain = Domain.load(domain.parent!)
+    if (parentDomain != null) {
+      parentDomain.subdomainCount = parentDomain.subdomainCount - 1
+      parentDomain.save()
+      return recurseDomainDelete(parentDomain)
+    }
+
+    return null
+  }
+
+  return domain.id
+}
+
+function saveDomain(domain: Domain): void {
+  recurseDomainDelete(domain)
+  domain.save()
+}
+
 // Handler for NewOwner events
 function _handleNewOwner(event: NewOwnerEvent, isMigrated: boolean): void {
   let account = new Account(event.params.owner.toHexString())
@@ -53,9 +79,17 @@ function _handleNewOwner(event: NewOwnerEvent, isMigrated: boolean): void {
 
   let subnode = makeSubnode(event)
   let domain = getDomain(subnode, event.block.timestamp);
-  if(domain === null) {
+  let parent = getDomain(event.params.node.toHexString())
+
+  if (domain === null) {
     domain = new Domain(subnode)
     domain.createdAt = event.block.timestamp
+    domain.subdomainCount = 0
+  }
+
+  if (domain.parent === null && parent !== null) {
+    parent.subdomainCount = parent.subdomainCount + 1
+    parent.save()
   }
 
   if(domain.name == null) {
@@ -71,7 +105,7 @@ function _handleNewOwner(event: NewOwnerEvent, isMigrated: boolean): void {
     if(event.params.node.toHexString() == '0x0000000000000000000000000000000000000000000000000000000000000000') {
       domain.name = label
     } else {
-      let parent = Domain.load(event.params.node.toHexString())!
+      parent = parent!
       let name = parent.name
       if (label && name ) {
         domain.name = label + '.'  + name
@@ -83,7 +117,7 @@ function _handleNewOwner(event: NewOwnerEvent, isMigrated: boolean): void {
   domain.parent = event.params.node.toHexString()
   domain.labelhash = event.params.label
   domain.isMigrated = isMigrated
-  domain.save()
+  saveDomain(domain)
 
   let domainEvent = new NewOwner(createEventID(event))
   domainEvent.blockNumber = event.block.number.toI32()
@@ -103,8 +137,9 @@ export function handleTransfer(event: TransferEvent): void {
 
   // Update the domain owner
   let domain = getDomain(node)!
+
   domain.owner = event.params.owner.toHexString()
-  domain.save()
+  saveDomain(domain)
 
   let domainEvent = new Transfer(createEventID(event))
   domainEvent.blockNumber = event.block.number.toI32()
@@ -131,7 +166,7 @@ export function handleNewResolver(event: NewResolverEvent): void {
   } else {
     domain.resolvedAddress = resolver.addr
   }
-  domain.save()
+  saveDomain(domain)
 
   let domainEvent = new NewResolver(createEventID(event))
   domainEvent.blockNumber = event.block.number.toI32()
@@ -144,9 +179,13 @@ export function handleNewResolver(event: NewResolverEvent): void {
 // Handler for NewTTL events
 export function handleNewTTL(event: NewTTLEvent): void {
   let node = event.params.node.toHexString()
-  let domain = getDomain(node)!
-  domain.ttl = event.params.ttl
-  domain.save()
+  let domain = getDomain(node)
+  // For the edge case that a domain's owner and resolver are set to empty
+  // in the same transaction as setting TTL
+  if (domain) {
+    domain.ttl = event.params.ttl
+    domain.save()
+  }
 
   let domainEvent = new NewTTL(createEventID(event))
   domainEvent.blockNumber = event.block.number.toI32()

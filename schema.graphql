@@ -12,8 +12,10 @@ type Domain @entity {
   ttl: BigInt
   isMigrated: Boolean!
   createdAt: BigInt!
-  fuses: BigInt
   events: [DomainEvent!]! @derivedFrom(field: "domain")
+
+  registration: Registration @derivedFrom(field: "domain")
+  wrappedDomain: WrappedDomain @derivedFrom(field: "domain")
 }
 
 interface DomainEvent {
@@ -21,32 +23,6 @@ interface DomainEvent {
   domain: Domain!
   blockNumber: Int!
   transactionID: Bytes!
-}
-
-type NameWrapped implements DomainEvent @entity  {
-  id: ID!
-  domain: Domain!
-  blockNumber: Int!
-  transactionID: Bytes!
-  name: String!
-  fuses: BigInt!
-  owner: Account!
-}
-
-type NameUnwrapped implements DomainEvent @entity  {
-  id: ID!
-  domain: Domain!
-  blockNumber: Int!
-  transactionID: Bytes!
-  owner: Account!
-}
-
-type FusesSet implements DomainEvent @entity  {
-  id: ID!
-  domain: Domain!
-  blockNumber: Int!
-  transactionID: Bytes!
-  fuses: BigInt! 
 }
 
 type Transfer implements DomainEvent @entity {
@@ -82,20 +58,49 @@ type NewTTL implements DomainEvent @entity {
   ttl: BigInt!
 }
 
-type Account @entity {
+type WrappedTransfer implements DomainEvent @entity {
   id: ID!
-  domains: [Domain!]! @derivedFrom(field: "owner")
-  registrations: [Registration!] @derivedFrom(field: "registrant")
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
+  owner: Account!
+}
+
+type NameWrapped implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
+  name: String!
+  fuses: BigInt!
+  owner: Account!
+  expiry: BigInt!
+}
+
+type NameUnwrapped implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
+  owner: Account!
+}
+
+type FusesSet implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
+  fuses: BigInt! 
+  expiry: BigInt!
 }
 
 type Registration @entity {
   id: ID!
-  domain: Domain
+  domain: Domain!
   registrationDate: BigInt!
   expiryDate: BigInt!
   cost: BigInt
   registrant: Account!
-  labelName: String
   events: [RegistrationEvent!]! @derivedFrom(field: "registration")
 }
 
@@ -129,6 +134,21 @@ type NameTransferred implements RegistrationEvent @entity {
   blockNumber: Int!
   transactionID: Bytes!
   newOwner: Account!
+}
+
+type WrappedDomain @entity {
+  id: ID!
+  domain: Domain!
+  expiryDate: BigInt!
+  fuses: BigInt!
+  owner: Account!
+}
+
+type Account @entity {
+  id: ID!
+  domains: [Domain!]! @derivedFrom(field: "owner")
+  wrappedDomains: [WrappedDomain!] @derivedFrom(field: "owner")
+  registrations: [Registration!] @derivedFrom(field: "registrant")
 }
 
 type Resolver @entity {

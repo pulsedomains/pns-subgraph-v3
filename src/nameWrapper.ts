@@ -1,13 +1,13 @@
 // Import types and APIs from graph-ts
 import {
-  Bytes
+  Bytes, store
 } from '@graphprotocol/graph-ts'
 // Import event types from the registry contract ABI
 import {
   FusesSet as FusesSetEvent, NameUnwrapped as NameUnwrappedEvent, NameWrapped as NameWrappedEvent
 } from './types/NameWrapper/NameWrapper'
 // Import entity types generated from the GraphQL schema
-import { Account, Domain, FusesSet, NameUnwrapped, NameWrapped } from './types/schema'
+import { Account, Domain, FusesSet, NameUnwrapped, NameWrapped, WrappedDomain } from './types/schema'
 import { concat, createEventID } from './utils'
 
 function decodeName (buf:Bytes):Array<string> {
@@ -52,9 +52,14 @@ export function handleNameWrapped(event: NameWrappedEvent): void {
     domain.labelName = label
     domain.name = name
   }
-  domain.owner = owner.id
-  domain.fuses = fuses
   domain.save()
+
+  let wrappedDomain = new WrappedDomain(node.toHex())
+  wrappedDomain.domain = domain.id
+  wrappedDomain.expiryDate = event.params.expiry
+  wrappedDomain.fuses = fuses
+  wrappedDomain.owner = owner.id
+  wrappedDomain.save()
 
   let nameWrappedEvent = new NameWrapped(createEventID(event))  
   nameWrappedEvent.domain = domain.id
@@ -71,29 +76,29 @@ export function handleNameUnwrapped(event: NameUnwrappedEvent): void {
   let blockNumber = event.block.number.toI32()
   let transactionID = event.transaction.hash
   let owner = Account.load(event.params.owner.toHex())!
-  let domain = Domain.load(node.toHex())!
-  domain.owner = owner.id
-  domain.fuses = null
-  domain.save()
 
   let nameUnwrappedEvent = new NameUnwrapped(createEventID(event))  
-  nameUnwrappedEvent.domain = domain.id
+  nameUnwrappedEvent.domain = node.toHex()
   nameUnwrappedEvent.owner = owner.id
   nameUnwrappedEvent.blockNumber = blockNumber
   nameUnwrappedEvent.transactionID = transactionID
   nameUnwrappedEvent.save()
+
+  store.remove('WrappedDomain', node.toHex())
 }
 
 export function handleFusesSet(event: FusesSetEvent): void {
   let node = event.params.node
   let fuses = event.params.fuses
+  let expiry = event.params.expiry
   let blockNumber = event.block.number.toI32()
   let transactionID = event.transaction.hash
-  let domain = Domain.load(node.toHex())!
-  domain.fuses = fuses
-  domain.save()
+  let wrappedDomain = WrappedDomain.load(node.toHex())!
+  wrappedDomain.fuses = fuses
+  wrappedDomain.expiryDate = expiry
+  wrappedDomain.save()
   let fusesBurnedEvent = new FusesSet(createEventID(event))  
-  fusesBurnedEvent.domain = domain.id
+  fusesBurnedEvent.domain = node.toHex()
   fusesBurnedEvent.fuses = fuses
   fusesBurnedEvent.blockNumber = blockNumber
   fusesBurnedEvent.transactionID = transactionID

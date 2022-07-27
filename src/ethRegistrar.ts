@@ -37,15 +37,18 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
 
   let label = uint256ToByteArray(event.params.id)
   let registration = new Registration(label.toHex())
-  registration.domain = crypto.keccak256(concat(rootNode, label)).toHex()
+  let domain = Domain.load(crypto.keccak256(concat(rootNode, label)).toHex())!
+
+  registration.domain = domain.id
   registration.registrationDate = event.block.timestamp
   registration.expiryDate = event.params.expires
   registration.registrant = account.id
 
   let labelName = ens.nameByHash(label.toHexString())
   if (labelName != null) {
-    registration.labelName = labelName
+    domain.labelName = labelName
   }
+  domain.save()
   registration.save()
 
   let registrationEvent = new NameRegistered(createEventID(event))
@@ -93,7 +96,6 @@ function setNamePreimage(name: string, label: Bytes, cost: BigInt): void {
 
   let registration = Registration.load(label.toHex());
   if(registration == null) return
-  registration.labelName = name
   registration.cost = cost
   registration.save()
 }

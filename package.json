@@ -1,7 +1,7 @@
 {
   "name": "ens-subgraph",
   "version": "1.0.2",
-  "repository": "https://github.com/ensdomains/ens-subgraph",
+  "repository": "https://github.com/pnsdomains/ens-subgraph",
   "license": "MIT",
   "scripts": {
     "codegen": "graph codegen --output-dir src/types/",

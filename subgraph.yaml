@@ -2,7 +2,7 @@ specVersion: 0.0.3
 description: >-
   A secure & decentralized way to address resources on and off the blockchain
   using simple, human-readable names. Access domains and transfer history.
-repository: "https://github.com/pnsdomains/ens-subgraph"
+repository: "https://github.com/pulsedomains/pns-subgraph"
 schema:
   file: ./schema.graphql
 dataSources:
@@ -10,7 +10,7 @@ dataSources:
     name: ENSRegistry
     network: pulsechain
     source:
-      address: "0xF49233142Fc9c22F475e918c718755e6aA247c04"
+      address: "0x224248B45381Fa0Fab9edD89858c4c60A4B44014"
       abi: EnsRegistry
     mapping:
       kind: ethereum/events
@@ -33,6 +33,33 @@ dataSources:
           handler: handleNewResolver
         - event: "NewTTL(indexed bytes32,uint64)"
           handler: handleNewTTL
+  - kind: ethereum/contract
+    name: ENSRegistryOld
+    network: pulsechain
+    source:
+      address: '0xF49233142Fc9c22F475e918c718755e6aA247c04'
+      abi: EnsRegistry
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/ensRegistry.ts
+      entities:
+        - Domain
+        - Account
+        - Resolver
+      abis:
+        - name: EnsRegistry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: 'Transfer(indexed bytes32,address)'
+          handler: handleTransferOldRegistry
+        - event: 'NewOwner(indexed bytes32,indexed bytes32,address)'
+          handler: handleNewOwnerOldRegistry
+        - event: 'NewResolver(indexed bytes32,address)'
+          handler: handleNewResolverOldRegistry
+        - event: 'NewTTL(indexed bytes32,uint64)'
+          handler: handleNewTTLOldRegistry
   - kind: ethereum/contract
     name: Resolver
     network: pulsechain
@@ -81,7 +108,7 @@ dataSources:
     name: BaseRegistrar
     network: pulsechain
     source:
-      address: "0xD5A973196575096eF0aC1586dE9e2E04aCf9cA7f"
+      address: "0x99A3487Ac740A49Cb2780bEB002DcF93682C248E"
       abi: BaseRegistrar
     mapping:
       kind: ethereum/events
@@ -107,7 +134,7 @@ dataSources:
     name: EthRegistrarController
     network: pulsechain
     source:
-      address: "0x40E38A14892983B0761B444b6eC2d547Dd26f618"
+      address: "0x9777414Bfdd9dF0eb5906e9aC1c8FC0bB0AfA412"
       abi: EthRegistrarController
     mapping:
       kind: ethereum/events

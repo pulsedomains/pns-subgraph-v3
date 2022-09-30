@@ -178,6 +178,12 @@ export function handleVersionChanged(event: VersionChangedEvent): void {
   resolverEvent.version = event.params.newVersion
   resolverEvent.save()
 
+  let domain = Domain.load(event.params.node.toHexString())
+  if(domain && domain.resolver === resolverEvent.resolver) {
+    domain.resolvedAddress = null
+    domain.save()
+  }
+
   let resolver = getOrCreateResolver(event.params.node, event.address)
   resolver.addr = null
   resolver.contentHash = null

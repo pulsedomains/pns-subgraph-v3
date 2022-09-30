@@ -104,11 +104,13 @@ dataSources:
           handler: handlePubkeyChanged
         - event: "TextChanged(indexed bytes32,indexed string,string)"
           handler: handleTextChanged
+        - event: "TextChanged(indexed bytes32,indexed string,string,string)"
+          handler: handleTextChanged
   - kind: ethereum/contract
     name: BaseRegistrar
     network: mainnet
     source:
-      address: "0xc5a5C42992dECbae36851359345FE25997F5C42d"
+      address: "0x4A679253410272dd5232B3Ff7cF5dbB88f295319"
       abi: BaseRegistrar
     mapping:
       kind: ethereum/events
@@ -134,7 +136,7 @@ dataSources:
     name: EthRegistrarControllerOld
     network: mainnet
     source:
-      address: "0x851356ae760d987E095750cCeb3bC6014560891C"
+      address: "0xa82fF9aFd8f496c3d6ac40E2a0F282E47488CFc9"
       abi: EthRegistrarControllerOld
     mapping:
       kind: ethereum/events
@@ -157,7 +159,7 @@ dataSources:
     name: EthRegistrarController
     network: mainnet
     source:
-      address: "0x4826533B4897376654Bb4d4AD88B7faFD0C98528"
+      address: "0x95401dc811bb5740090279Ba06cfA8fcF6113778"
       abi: EthRegistrarController
     mapping:
       kind: ethereum/events
@@ -180,7 +182,7 @@ dataSources:
     name: NameWrapper
     network: mainnet
     source:
-      address: "0x9E545E3C0baAB3E08CdfD552C960A1050f373042"
+      address: "0xE6E340D132b5f46d1e472DebcD681B2aBc16e57E"
       abi: NameWrapper
     mapping:
       kind: ethereum/events

@@ -8,7 +8,7 @@ import {
 } from './types/NameWrapper/NameWrapper'
 // Import entity types generated from the GraphQL schema
 import { Account, Domain, FusesSet, NameUnwrapped, NameWrapped, WrappedDomain } from './types/schema'
-import { concat, createEventID } from './utils'
+import { concat, createEventID, createOrLoadAccount } from './utils'
 
 function decodeName (buf:Bytes):Array<string> {
   let offset = 0
@@ -45,7 +45,7 @@ export function handleNameWrapped(event: NameWrappedEvent): void {
   let fuses = event.params.fuses
   let blockNumber = event.block.number.toI32()
   let transactionID = event.transaction.hash
-  let owner = Account.load(event.params.owner.toHex())!
+  let owner = createOrLoadAccount(event.params.owner.toHex())
   let domain = Domain.load(node.toHex())!
 
   if(!domain.labelName){
@@ -75,7 +75,7 @@ export function handleNameUnwrapped(event: NameUnwrappedEvent): void {
   let node = event.params.node
   let blockNumber = event.block.number.toI32()
   let transactionID = event.transaction.hash
-  let owner = Account.load(event.params.owner.toHex())!
+  let owner = createOrLoadAccount(event.params.owner.toHex())
 
   let nameUnwrappedEvent = new NameUnwrapped(createEventID(event))  
   nameUnwrappedEvent.domain = node.toHex()

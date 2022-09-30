@@ -4,6 +4,7 @@ import {
   ByteArray,
   ethereum
 } from '@graphprotocol/graph-ts'
+import { Account } from './types/schema'
 
 export function createEventID(event:  ethereum.Event): string {
   return event.block.number.toString().concat('-').concat(event.logIndex.toString())
@@ -39,4 +40,14 @@ export function byteArrayFromHex(s: string): ByteArray {
 export function uint256ToByteArray(i: BigInt): ByteArray {
   let hex = i.toHex().slice(2).padStart(64, '0')
   return byteArrayFromHex(hex)
+}
+
+export function createOrLoadAccount(address: string): Account {
+  let account = Account.load(address)
+  if (account == null) {
+    account = new Account(address)
+    account.save()
+  }
+
+  return account
 }

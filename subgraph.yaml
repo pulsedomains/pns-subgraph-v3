@@ -106,6 +106,8 @@ dataSources:
           handler: handleTextChanged
         - event: "TextChanged(indexed bytes32,indexed string,string,string)"
           handler: handleTextChanged
+        - event: "VersionChanged(indexed bytes32,uint64)"
+          handler: handleVersionChanged
   - kind: ethereum/contract
     name: BaseRegistrar
     network: mainnet

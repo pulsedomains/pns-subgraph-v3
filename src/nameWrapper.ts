@@ -59,6 +59,7 @@ export function handleNameWrapped(event: NameWrappedEvent): void {
   wrappedDomain.expiryDate = event.params.expiry
   wrappedDomain.fuses = fuses
   wrappedDomain.owner = owner.id
+  wrappedDomain.labelName = name
   wrappedDomain.save()
 
   let nameWrappedEvent = new NameWrapped(createEventID(event))  

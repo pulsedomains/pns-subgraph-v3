@@ -101,6 +101,7 @@ type Registration @entity {
   expiryDate: BigInt!
   cost: BigInt
   registrant: Account!
+  labelName: String
   events: [RegistrationEvent!]! @derivedFrom(field: "registration")
 }
 
@@ -142,6 +143,7 @@ type WrappedDomain @entity {
   expiryDate: BigInt!
   fuses: BigInt!
   owner: Account!
+  labelName: String
 }
 
 type Account @entity {
@@ -219,6 +221,7 @@ type TextChanged implements ResolverEvent @entity {
   blockNumber: Int!
   transactionID: Bytes!
   key: String!
+  value: String
 }
 
 type ContenthashChanged implements ResolverEvent @entity {

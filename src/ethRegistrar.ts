@@ -47,6 +47,7 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
   let labelName = ens.nameByHash(label.toHexString())
   if (labelName != null) {
     domain.labelName = labelName
+    registration.labelName = labelName
   }
   domain.save()
   registration.save()
@@ -96,6 +97,7 @@ function setNamePreimage(name: string, label: Bytes, cost: BigInt): void {
 
   let registration = Registration.load(label.toHex());
   if(registration == null) return
+  registration.labelName = name
   registration.cost = cost
   registration.save()
 }

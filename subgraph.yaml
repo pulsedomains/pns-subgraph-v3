@@ -105,7 +105,7 @@ dataSources:
         - event: "TextChanged(indexed bytes32,indexed string,string)"
           handler: handleTextChanged
         - event: "TextChanged(indexed bytes32,indexed string,string,string)"
-          handler: handleTextChanged
+          handler: handleTextChangedWithValue
         - event: "VersionChanged(indexed bytes32,uint64)"
           handler: handleVersionChanged
   - kind: ethereum/contract
@@ -138,7 +138,7 @@ dataSources:
     name: EthRegistrarControllerOld
     network: mainnet
     source:
-      address: "0xa82fF9aFd8f496c3d6ac40E2a0F282E47488CFc9"
+      address: "0x1613beB3B2C4f22Ee086B2b38C1476A3cE7f78E8"
       abi: EthRegistrarControllerOld
     mapping:
       kind: ethereum/events

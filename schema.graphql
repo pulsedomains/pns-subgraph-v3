@@ -199,3 +199,11 @@ type AuthorisationChanged implements ResolverEvent @entity {
   target: Bytes!
   isAuthorized: Boolean!
 }
+
+type VersionChanged implements ResolverEvent @entity {
+  id: ID!
+  resolver: Resolver!
+  blockNumber: Int!
+  transactionID: Bytes!
+  version: BigInt!
+}

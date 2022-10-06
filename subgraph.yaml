@@ -205,21 +205,3 @@ dataSources:
           handler: handleNameUnwrapped
         - event: "FusesSet(indexed bytes32,uint32,uint64)"
           handler: handleFusesSet
-  - kind: ethereum/contract
-    name: ReverseRegistrar
-    network: mainnet
-    source:
-      abi: ReverseRegistrar
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      file: ./src/reverseRegistrar.ts
-      entities:
-        - ReverseRegistration
-      abis:
-        - name: ReverseRegistrar
-          file: ./abis/ReverseRegistrar.json
-      eventHandlers:
-        - event: "ReverseClaimed(indexed address,indexed bytes32)"
-          handler: handleReverseClaimed

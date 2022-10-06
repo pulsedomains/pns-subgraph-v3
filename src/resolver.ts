@@ -85,10 +85,6 @@ export function handleMulticoinAddrChanged(event: AddressChangedEvent): void {
 
 export function handleNameChanged(event: NameChangedEvent): void {
   if(event.params.name.indexOf("\u0000") != -1) return;
-  
-  let resolver = getOrCreateResolver(event.params.node, event.address)
-  resolver.name = event.params.name
-  resolver.save()
 
   let resolverEvent = new NameChanged(createEventID(event))
   resolverEvent.resolver = createResolverID(event.params.node, event.address)

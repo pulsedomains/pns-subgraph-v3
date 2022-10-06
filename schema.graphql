@@ -149,7 +149,6 @@ type WrappedDomain @entity {
 type Account @entity {
   id: ID!
   domains: [Domain!]! @derivedFrom(field: "owner")
-  reverseDomain: Domain
   wrappedDomains: [WrappedDomain!] @derivedFrom(field: "owner")
   registrations: [Registration!] @derivedFrom(field: "registrant")
 }
@@ -162,7 +161,6 @@ type Resolver @entity {
   contentHash: Bytes        # Content hash, in binary format.
   texts: [String!]          # Set of observed text record keys
   coinTypes: [BigInt!]      # Set of observed SLIP-44 coin types
-  name: String
   events: [ResolverEvent!]! @derivedFrom(field: "resolver")
 }
 
@@ -257,12 +255,4 @@ type VersionChanged implements ResolverEvent @entity {
   blockNumber: Int!
   transactionID: Bytes!
   version: BigInt!
-}
-
-type ReverseClaimed @entity {
-  id: ID!
-  registrant: Account!
-  domain: Domain!
-  blockNumber: Int!
-  transactionID: Bytes!
 }

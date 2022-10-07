@@ -14,6 +14,7 @@ import {
   NameChanged as NameChangedEvent,
   PubkeyChanged as PubkeyChangedEvent,
   TextChanged as TextChangedEvent,
+  TextChanged1 as TextChangedWithValueEvent,
   VersionChanged as VersionChangedEvent,
 } from "./types/Resolver/Resolver";
 
@@ -84,7 +85,7 @@ export function handleMulticoinAddrChanged(event: AddressChangedEvent): void {
 
 export function handleNameChanged(event: NameChangedEvent): void {
   if(event.params.name.indexOf("\u0000") != -1) return;
-  
+
   let resolverEvent = new NameChanged(createEventID(event))
   resolverEvent.resolver = createResolverID(event.params.node, event.address)
   resolverEvent.blockNumber = event.block.number.toI32()
@@ -133,6 +134,31 @@ export function handleTextChanged(event: TextChangedEvent): void {
   resolverEvent.blockNumber = event.block.number.toI32()
   resolverEvent.transactionID = event.transaction.hash
   resolverEvent.key = event.params.key
+  resolverEvent.save()
+}
+
+export function handleTextChangedWithValue(event: TextChangedWithValueEvent): void {
+  let resolver = getOrCreateResolver(event.params.node, event.address)
+
+  let key = event.params.key;
+  if(resolver.texts == null) {
+    resolver.texts = [key];
+    resolver.save();
+  } else {
+    let texts = resolver.texts!
+    if(!texts.includes(key)){
+      texts.push(key)
+      resolver.texts = texts
+      resolver.save()
+    }
+  }
+
+  let resolverEvent = new TextChanged(createEventID(event))
+  resolverEvent.resolver = createResolverID(event.params.node, event.address)
+  resolverEvent.blockNumber = event.block.number.toI32()
+  resolverEvent.transactionID = event.transaction.hash
+  resolverEvent.key = event.params.key
+  resolverEvent.value = event.params.value
   resolverEvent.save()
 }
 

@@ -13,6 +13,9 @@ type Domain @entity {
   isMigrated: Boolean!
   createdAt: BigInt!
   events: [DomainEvent!]! @derivedFrom(field: "domain")
+
+  registration: Registration @derivedFrom(field: "domain")
+  wrappedDomain: WrappedDomain @derivedFrom(field: "domain")
 }
 
 interface DomainEvent {
@@ -55,15 +58,45 @@ type NewTTL implements DomainEvent @entity {
   ttl: BigInt!
 }
 
-type Account @entity {
+type WrappedTransfer implements DomainEvent @entity {
   id: ID!
-  domains: [Domain!]! @derivedFrom(field: "owner")
-  registrations: [Registration!] @derivedFrom(field: "registrant")
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
+  owner: Account!
+}
+
+type NameWrapped implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
+  name: String!
+  fuses: BigInt!
+  owner: Account!
+  expiry: BigInt!
+}
+
+type NameUnwrapped implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
+  owner: Account!
+}
+
+type FusesSet implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
+  fuses: BigInt!
+  expiry: BigInt!
 }
 
 type Registration @entity {
   id: ID!
-  domain: Domain
+  domain: Domain!
   registrationDate: BigInt!
   expiryDate: BigInt!
   cost: BigInt
@@ -104,11 +137,26 @@ type NameTransferred implements RegistrationEvent @entity {
   newOwner: Account!
 }
 
+type WrappedDomain @entity {
+  id: ID!
+  domain: Domain!
+  expiryDate: BigInt!
+  fuses: BigInt!
+  owner: Account!
+  labelName: String
+}
+
+type Account @entity {
+  id: ID!
+  domains: [Domain!]! @derivedFrom(field: "owner")
+  wrappedDomains: [WrappedDomain!] @derivedFrom(field: "owner")
+  registrations: [Registration!] @derivedFrom(field: "registrant")
+}
+
 type Resolver @entity {
   id: ID!                   # Concatenation of resolver address and namehash
   domain: Domain
   address: Bytes!           # Address of resolver contract
-
   addr: Account             # Current value of addr record (per events)
   contentHash: Bytes        # Content hash, in binary format.
   texts: [String!]          # Set of observed text record keys
@@ -171,6 +219,7 @@ type TextChanged implements ResolverEvent @entity {
   blockNumber: Int!
   transactionID: Bytes!
   key: String!
+  value: String
 }
 
 type ContenthashChanged implements ResolverEvent @entity {

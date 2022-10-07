@@ -106,6 +106,8 @@ dataSources:
           handler: handlePubkeyChanged
         - event: "TextChanged(indexed bytes32,indexed string,string)"
           handler: handleTextChanged
+        - event: "TextChanged(indexed bytes32,indexed string,string,string)"
+          handler: handleTextChangedWithValue
         - event: "VersionChanged(indexed bytes32,uint64)"
           handler: handleVersionChanged
   - kind: ethereum/contract
@@ -136,12 +138,34 @@ dataSources:
         - event: "Transfer(indexed address,indexed address,indexed uint256)"
           handler: handleNameTransferred
   - kind: ethereum/contract
-    name: EthRegistrarController
+    name: EthRegistrarControllerOld
     network: mainnet
     source:
       address: "0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5"
-      abi: EthRegistrarController
+      abi: EthRegistrarControllerOld
       startBlock: 9380471
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/ethRegistrar.ts
+      entities:
+        - Registration
+      abis:
+        - name: EthRegistrarControllerOld
+          file: ./abis/EthRegistrarControllerOld.json
+      eventHandlers:
+        - event: >-
+            NameRegistered(string,indexed bytes32,indexed
+            address,uint256,uint256)
+          handler: handleNameRegisteredByControllerOld
+        - event: "NameRenewed(string,indexed bytes32,uint256,uint256)"
+          handler: handleNameRenewedByController
+  - kind: ethereum/contract
+    name: EthRegistrarController
+    network: mainnet
+    source:
+      abi: EthRegistrarController
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -155,7 +179,29 @@ dataSources:
       eventHandlers:
         - event: >-
             NameRegistered(string,indexed bytes32,indexed
-            address,uint256,uint256)
+            address,uint256,uint256,uint256)
           handler: handleNameRegisteredByController
         - event: "NameRenewed(string,indexed bytes32,uint256,uint256)"
           handler: handleNameRenewedByController
+  - kind: ethereum/contract
+    name: NameWrapper
+    network: mainnet
+    source:
+      abi: NameWrapper
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/nameWrapper.ts
+      entities:
+        - NameWrapper
+      abis:
+        - name: NameWrapper
+          file: ./abis/NameWrapper.json
+      eventHandlers:
+        - event: "NameWrapped(indexed bytes32,bytes,address,uint32,uint64)"
+          handler: handleNameWrapped
+        - event: "NameUnwrapped(indexed bytes32,address)"
+          handler: handleNameUnwrapped
+        - event: "FusesSet(indexed bytes32,uint32,uint64)"
+          handler: handleFusesSet

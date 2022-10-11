@@ -10,7 +10,7 @@ dataSources:
     name: ENSRegistry
     network: pulsechain
     source:
-      address: "0x224248B45381Fa0Fab9edD89858c4c60A4B44014"
+      address: "0xf4351A1D5Ee468ad77707A1cFD11E1D798e93ec5"
       abi: EnsRegistry
     mapping:
       kind: ethereum/events
@@ -33,33 +33,6 @@ dataSources:
           handler: handleNewResolver
         - event: "NewTTL(indexed bytes32,uint64)"
           handler: handleNewTTL
-  - kind: ethereum/contract
-    name: ENSRegistryOld
-    network: pulsechain
-    source:
-      address: '0xF49233142Fc9c22F475e918c718755e6aA247c04'
-      abi: EnsRegistry
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      file: ./src/ensRegistry.ts
-      entities:
-        - Domain
-        - Account
-        - Resolver
-      abis:
-        - name: EnsRegistry
-          file: ./abis/Registry.json
-      eventHandlers:
-        - event: 'Transfer(indexed bytes32,address)'
-          handler: handleTransferOldRegistry
-        - event: 'NewOwner(indexed bytes32,indexed bytes32,address)'
-          handler: handleNewOwnerOldRegistry
-        - event: 'NewResolver(indexed bytes32,address)'
-          handler: handleNewResolverOldRegistry
-        - event: 'NewTTL(indexed bytes32,uint64)'
-          handler: handleNewTTLOldRegistry
   - kind: ethereum/contract
     name: Resolver
     network: pulsechain
@@ -108,7 +81,7 @@ dataSources:
     name: BaseRegistrar
     network: pulsechain
     source:
-      address: "0x99A3487Ac740A49Cb2780bEB002DcF93682C248E"
+      address: "0x7370860E05820a26CE903A9B91EEACc5B905021D"
       abi: BaseRegistrar
     mapping:
       kind: ethereum/events
@@ -134,7 +107,7 @@ dataSources:
     name: EthRegistrarController
     network: pulsechain
     source:
-      address: "0x9777414Bfdd9dF0eb5906e9aC1c8FC0bB0AfA412"
+      address: "0xa18084ba1bD1A20caB9a46a3e55355FFD5826fA3"
       abi: EthRegistrarController
     mapping:
       kind: ethereum/events

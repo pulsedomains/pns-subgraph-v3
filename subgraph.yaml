@@ -10,7 +10,7 @@ dataSources:
     name: ENSRegistry
     network: pulsechain
     source:
-      address: "0xf4351A1D5Ee468ad77707A1cFD11E1D798e93ec5"
+      address: "0x50A3F84528CBA0cF63d9f9eFD00BCc4B7F03a870"
       abi: EnsRegistry
     mapping:
       kind: ethereum/events
@@ -81,7 +81,7 @@ dataSources:
     name: BaseRegistrar
     network: pulsechain
     source:
-      address: "0x7370860E05820a26CE903A9B91EEACc5B905021D"
+      address: "0x52F4a9a5333b25755d0Cd769490823D4b4278dfc"
       abi: BaseRegistrar
     mapping:
       kind: ethereum/events
@@ -107,7 +107,7 @@ dataSources:
     name: EthRegistrarController
     network: pulsechain
     source:
-      address: "0xa18084ba1bD1A20caB9a46a3e55355FFD5826fA3"
+      address: "0x5Cc9D5E2240b931A5a686d5FCFC95bd31C7593EF"
       abi: EthRegistrarController
     mapping:
       kind: ethereum/events

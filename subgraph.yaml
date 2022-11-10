@@ -1,4 +1,4 @@
-specVersion: 0.0.3
+specVersion: 0.0.4
 description: >-
   A secure & decentralized way to address resources on and off the blockchain
   using simple, human-readable names. Access domains and transfer history.
@@ -10,8 +10,9 @@ dataSources:
     name: ENSRegistry
     network: pulsechain
     source:
-      address: "0x50A3F84528CBA0cF63d9f9eFD00BCc4B7F03a870"
+      address: "0xA0A205982f79E873b0C197deF86f1a5911CC117f"
       abi: EnsRegistry
+      startBlock: 20995166
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -37,7 +38,9 @@ dataSources:
     name: Resolver
     network: pulsechain
     source:
+      address: "0x0154F8F28C0b85D87Cb3a7Cbd4BC7373C44A149c"
       abi: Resolver
+      startBlock: 20995258
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -81,8 +84,9 @@ dataSources:
     name: BaseRegistrar
     network: pulsechain
     source:
-      address: "0x52F4a9a5333b25755d0Cd769490823D4b4278dfc"
+      address: "0xb4Eb0CEEC7219EAF64c7B03Ed57e496EeC21c5A0"
       abi: BaseRegistrar
+      startBlock: 20995203
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -107,8 +111,9 @@ dataSources:
     name: EthRegistrarController
     network: pulsechain
     source:
-      address: "0x5Cc9D5E2240b931A5a686d5FCFC95bd31C7593EF"
+      address: "0xC7c8B3DEA292fA28B1428b0c8f9693654d6902A9"
       abi: EthRegistrarController
+      startBlock: 20995292
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5

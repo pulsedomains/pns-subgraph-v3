@@ -10,9 +10,9 @@
     "deploy-local": "graph deploy graphprotocol/pns --debug --ipfs http://127.0.0.1:5001 --node http://127.0.0.1:8020/ --version-label 0.0.1",
     "remove-local": "graph remove graphprotocol/pns --node http://127.0.0.1:8020",
     "server:setup": "yarn codegen && yarn server:create-local && yarn server:deploy-local",
-    "server:create-local": "graph create graphprotocol/pns --node http://34.228.62.113:8020",
-    "server:deploy-local": "graph deploy graphprotocol/pns --debug --ipfs http://34.228.62.113:5001 --node http://34.228.62.113:8020/ --version-label 0.0.1",
-    "server:remove-local": "graph remove graphprotocol/pns --node http://34.228.62.113:8020",
+    "server:create-local": "graph create graphprotocol/pns --node https://graph.pulse.domains",
+    "server:deploy-local": "graph deploy graphprotocol/pns --debug --ipfs https://ipfs.pulse.domains --node https://graph.pulse.domains/ --version-label 0.0.1",
+    "server:remove-local": "graph remove graphprotocol/pns --node https://graph.pulse.domains",
     "build": "graph build",
     "deploy": "graph deploy ensdomains/ens --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
     "watch-local": "graph deploy graphprotocol/ens --watch --debug --node http://127.0.0.1:8020/ --ipfs http://localhost:5001"

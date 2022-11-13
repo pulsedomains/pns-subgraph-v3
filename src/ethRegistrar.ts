@@ -28,7 +28,7 @@ import {
 // Import entity types generated from the GraphQL schema
 import { Account, Domain, Registration, NameRegistered, NameRenewed, NameTransferred } from './types/schema'
 
-var rootNode:ByteArray = byteArrayFromHex("93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae")
+var rootNode:ByteArray = byteArrayFromHex("55fb31aa6f23709345f51ac8d7e4ed79336defe55be2733bc226ed0f1f62f3c8")
 
 export function handleNameRegistered(event: NameRegisteredEvent): void {
   let account = new Account(event.params.owner.toHex())
@@ -80,9 +80,9 @@ function setNamePreimage(name: string, label: Bytes, cost: BigInt): void {
   }
 
   let domain = Domain.load(crypto.keccak256(concat(rootNode, label)).toHex())!
-  if(domain.labelName !== name) {
+  if(domain.labelName == null || domain.labelName !== name) {
     domain.labelName = name
-    domain.name = name + '.eth'
+    domain.name = name + '.pls'
     domain.save()
   }
 

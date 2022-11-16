@@ -1,5 +1,9 @@
-import { Address, ByteArray, Bytes, ethereum, Value } from "@graphprotocol/graph-ts";
-import { Resolver as ResolverContract } from "./types/Resolver/Resolver";
+import {
+  Address,
+  Bytes,
+  ethereum,
+} from "@graphprotocol/graph-ts";
+
 import {
   ABIChanged as ABIChangedEvent,
   AddrChanged as AddrChangedEvent,
@@ -9,14 +13,26 @@ import {
   InterfaceChanged as InterfaceChangedEvent,
   NameChanged as NameChangedEvent,
   PubkeyChanged as PubkeyChangedEvent,
-  TextChanged as TextChangedEvent
-} from './types/Resolver/Resolver';
+  TextChanged as TextChangedEvent,
+  TextChanged1 as TextChangedWithValueEvent,
+  VersionChanged as VersionChangedEvent,
+} from "./types/Resolver/Resolver";
+
 import {
-  AbiChanged, Account, AddrChanged, AuthorisationChanged, ContenthashChanged, Domain, InterfaceChanged, MulticoinAddrChanged,
-  NameChanged, PubkeyChanged, Resolver, TextChanged
-} from './types/schema';
-
-
+  AbiChanged,
+  Account,
+  AddrChanged,
+  AuthorisationChanged,
+  ContenthashChanged,
+  Domain,
+  InterfaceChanged,
+  MulticoinAddrChanged,
+  NameChanged,
+  PubkeyChanged,
+  Resolver,
+  TextChanged,
+  VersionChanged,
+} from "./types/schema";
 
 export function handleAddrChanged(event: AddrChangedEvent): void {
   let account = new Account(event.params.a.toHexString())
@@ -69,7 +85,7 @@ export function handleMulticoinAddrChanged(event: AddressChangedEvent): void {
 
 export function handleNameChanged(event: NameChangedEvent): void {
   if(event.params.name.indexOf("\u0000") != -1) return;
-  
+
   let resolverEvent = new NameChanged(createEventID(event))
   resolverEvent.resolver = createResolverID(event.params.node, event.address)
   resolverEvent.blockNumber = event.block.number.toI32()
@@ -99,8 +115,6 @@ export function handlePubkeyChanged(event: PubkeyChangedEvent): void {
 
 export function handleTextChanged(event: TextChangedEvent): void {
   let resolver = getOrCreateResolver(event.params.node, event.address)
-  let contract = ResolverContract.bind(event.address)
-  let value = contract.try_text(event.params.node, event.params.key)
 
   let key = event.params.key;
   if(resolver.texts == null) {
@@ -120,7 +134,31 @@ export function handleTextChanged(event: TextChangedEvent): void {
   resolverEvent.blockNumber = event.block.number.toI32()
   resolverEvent.transactionID = event.transaction.hash
   resolverEvent.key = event.params.key
-  resolverEvent.value = value.value
+  resolverEvent.save()
+}
+
+export function handleTextChangedWithValue(event: TextChangedWithValueEvent): void {
+  let resolver = getOrCreateResolver(event.params.node, event.address)
+
+  let key = event.params.key;
+  if(resolver.texts == null) {
+    resolver.texts = [key];
+    resolver.save();
+  } else {
+    let texts = resolver.texts!
+    if(!texts.includes(key)){
+      texts.push(key)
+      resolver.texts = texts
+      resolver.save()
+    }
+  }
+
+  let resolverEvent = new TextChanged(createEventID(event))
+  resolverEvent.resolver = createResolverID(event.params.node, event.address)
+  resolverEvent.blockNumber = event.block.number.toI32()
+  resolverEvent.transactionID = event.transaction.hash
+  resolverEvent.key = event.params.key
+  resolverEvent.value = event.params.value
   resolverEvent.save()
 }
 
@@ -156,6 +194,28 @@ export function handleAuthorisationChanged(event: AuthorisationChangedEvent): vo
   resolverEvent.target = event.params.target
   resolverEvent.isAuthorized = event.params.isAuthorised
   resolverEvent.save()
+}
+
+export function handleVersionChanged(event: VersionChangedEvent): void {
+  let resolverEvent = new VersionChanged(createEventID(event))
+  resolverEvent.blockNumber = event.block.number.toI32()
+  resolverEvent.transactionID = event.transaction.hash
+  resolverEvent.resolver = createResolverID(event.params.node, event.address)
+  resolverEvent.version = event.params.newVersion
+  resolverEvent.save()
+
+  let domain = Domain.load(event.params.node.toHexString())
+  if(domain && domain.resolver === resolverEvent.resolver) {
+    domain.resolvedAddress = null
+    domain.save()
+  }
+
+  let resolver = getOrCreateResolver(event.params.node, event.address)
+  resolver.addr = null
+  resolver.contentHash = null
+  resolver.texts = null
+  resolver.coinTypes = null
+  resolver.save()
 }
 
 function getOrCreateResolver(node: Bytes, address: Address): Resolver {

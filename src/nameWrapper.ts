@@ -108,7 +108,12 @@ export function handleFusesSet(event: FusesSetEvent): void {
 
 function makeWrappedTransfer(blockNumber: i32, transactionID: Bytes, eventID: string, node: string, to: string): void {
   const _to = createOrLoadAccount(to)
-  const wrappedDomain = WrappedDomain.load(node)!
+  let wrappedDomain = WrappedDomain.load(node)
+  // new registrations emit the Transfer` event before the NameWrapped event
+  // so we need to create the WrappedDomain entity here
+  if (wrappedDomain == null) {
+    wrappedDomain = new WrappedDomain(node)
+  }
   wrappedDomain.owner = _to.id
   wrappedDomain.save()
   const wrappedTransfer = new WrappedTransfer(eventID)

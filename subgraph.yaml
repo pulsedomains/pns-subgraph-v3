@@ -10,9 +10,9 @@ dataSources:
     name: ENSRegistry
     network: pulsechain
     source:
-      address: "0x2FA42bb21Ed9b8E054Db044D6753AC72Fed7c933"
+      address: "0x4ba4261816255a80114a08587606bF14B0d9d13E"
       abi: EnsRegistry
-      startBlock: 21400053
+      startBlock: 21724393
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -38,9 +38,9 @@ dataSources:
     name: Resolver
     network: pulsechain
     source:
-      address: "0xFC2ecB9A6c12a3FdDF62dB6dBFd6313467762Fd0"
+      address: "0xd2eC910DCb03D35Cd6d033363c8C2E95f1EFdEF7"
       abi: Resolver
-      startBlock: 21400143
+      startBlock: 21724541
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -88,9 +88,9 @@ dataSources:
     name: BaseRegistrar
     network: pulsechain
     source:
-      address: "0xd7Fc99394D7Fae55BEB4b12a6406Cd2900974c08"
+      address: "0x7639DeE67370c3ACBaE42ad9f25c50C5c443F654"
       abi: BaseRegistrar
-      startBlock: 21400081
+      startBlock: 21724460
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -115,9 +115,9 @@ dataSources:
     name: EthRegistrarController
     network: pulsechain
     source:
-      address: "0x32f895f1feb874ddB79Cfa3e1A9A095168408C26"
+      address: "0x33bED43d1D77Ae7Bb25c20F583f4fc6D8461E2Bd"
       abi: EthRegistrarController
-      startBlock: 21400132
+      startBlock: 21724523
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -139,9 +139,9 @@ dataSources:
     name: NameWrapper
     network: pulsechain
     source:
-      address: "0xD5038da0246F2C3B32490fe5C58A742a256f3df5"
+      address: "0xf463874e9ED100f99A0af0D770526a6b4090d891"
       abi: NameWrapper
-      startBlock: 21400092
+      startBlock: 21724480
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5

@@ -4,11 +4,11 @@ import {
 } from '@graphprotocol/graph-ts'
 // Import event types from the registry contract ABI
 import {
-  FusesSet as FusesSetEvent, NameUnwrapped as NameUnwrappedEvent, NameWrapped as NameWrappedEvent
+  FusesSet as FusesSetEvent, NameUnwrapped as NameUnwrappedEvent, NameWrapped as NameWrappedEvent, TransferBatch as TransferBatchEvent, TransferSingle as TransferSingleEvent
 } from './types/NameWrapper/NameWrapper'
 // Import entity types generated from the GraphQL schema
-import { Account, Domain, FusesSet, NameUnwrapped, NameWrapped, WrappedDomain } from './types/schema'
-import { concat, createEventID, createOrLoadAccount } from './utils'
+import { Domain, FusesSet, NameUnwrapped, NameWrapped, WrappedDomain, WrappedTransfer } from './types/schema'
+import { concat, createEventID, createOrLoadAccount, createOrLoadDomain } from './utils'
 
 function decodeName (buf:Bytes):Array<string> {
   let offset = 0
@@ -37,6 +37,8 @@ function decodeName (buf:Bytes):Array<string> {
   return [firstLabel, list.toString()]
 }
 
+
+
 export function handleNameWrapped(event: NameWrappedEvent): void {
   let decoded = decodeName(event.params.name)
   let label = decoded[0]
@@ -46,7 +48,7 @@ export function handleNameWrapped(event: NameWrappedEvent): void {
   let blockNumber = event.block.number.toI32()
   let transactionID = event.transaction.hash
   let owner = createOrLoadAccount(event.params.owner.toHex())
-  let domain = Domain.load(node.toHex())!
+  let domain = createOrLoadDomain(node.toHex())
 
   if(!domain.labelName){
     domain.labelName = label
@@ -104,4 +106,37 @@ export function handleFusesSet(event: FusesSetEvent): void {
   fusesBurnedEvent.blockNumber = blockNumber
   fusesBurnedEvent.transactionID = transactionID
   fusesBurnedEvent.save()
+}
+
+function makeWrappedTransfer(blockNumber: i32, transactionID: Bytes, eventID: string, node: string, to: string): void {
+  const _to = createOrLoadAccount(to)
+  const domain = createOrLoadDomain(node)
+  let wrappedDomain = WrappedDomain.load(node)
+  // new registrations emit the Transfer` event before the NameWrapped event
+  // so we need to create the WrappedDomain entity here
+  if (wrappedDomain == null) {
+    wrappedDomain = new WrappedDomain(node)
+  }
+  wrappedDomain.owner = _to.id
+  wrappedDomain.save()
+  const wrappedTransfer = new WrappedTransfer(eventID)
+  wrappedTransfer.domain = domain.id
+  wrappedTransfer.blockNumber = blockNumber
+  wrappedTransfer.transactionID = transactionID
+  wrappedTransfer.owner = _to.id
+  wrappedTransfer.save()
+}
+
+export function handleTransferSingle(event: TransferSingleEvent): void {
+  makeWrappedTransfer(event.block.number.toI32(), event.transaction.hash, createEventID(event).concat('-0'), event.params.id.toHex(), event.params.to.toHex())
+}
+
+export function handleTransferBatch(event: TransferBatchEvent): void {
+  let blockNumber = event.block.number.toI32()
+  let transactionID = event.transaction.hash
+  let ids = event.params.ids
+  let to = event.params.to
+  for (let i = 0; i < ids.length; i++) {
+    makeWrappedTransfer(blockNumber, transactionID, createEventID(event).concat('-').concat(i.toString()), ids[i].toHex(), to.toHex())
+  }
 }

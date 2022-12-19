@@ -1,6 +1,6 @@
 // Import types and APIs from graph-ts
 import {
-  Bytes, store
+  Bytes, store, BigInt
 } from '@graphprotocol/graph-ts'
 // Import event types from the registry contract ABI
 import {
@@ -108,14 +108,15 @@ export function handleFusesSet(event: FusesSetEvent): void {
   fusesBurnedEvent.save()
 }
 
-function makeWrappedTransfer(blockNumber: i32, transactionID: Bytes, eventID: string, node: string, to: string): void {
+function makeWrappedTransfer(blockNumber: i32, transactionID: Bytes, eventID: string, node: BigInt, to: string): void {
   const _to = createOrLoadAccount(to)
-  const domain = createOrLoadDomain(node)
-  let wrappedDomain = WrappedDomain.load(node)
+  const namehash = '0x' + node.toHex().slice(2).padStart(64, '0')
+  const domain = createOrLoadDomain(namehash)
+  let wrappedDomain = WrappedDomain.load(namehash)
   // new registrations emit the Transfer` event before the NameWrapped event
   // so we need to create the WrappedDomain entity here
   if (wrappedDomain == null) {
-    wrappedDomain = new WrappedDomain(node)
+    wrappedDomain = new WrappedDomain(namehash)
   }
   wrappedDomain.owner = _to.id
   wrappedDomain.save()
@@ -128,7 +129,7 @@ function makeWrappedTransfer(blockNumber: i32, transactionID: Bytes, eventID: st
 }
 
 export function handleTransferSingle(event: TransferSingleEvent): void {
-  makeWrappedTransfer(event.block.number.toI32(), event.transaction.hash, createEventID(event).concat('-0'), event.params.id.toHex(), event.params.to.toHex())
+  makeWrappedTransfer(event.block.number.toI32(), event.transaction.hash, createEventID(event).concat('-0'), event.params.id, event.params.to.toHex())
 }
 
 export function handleTransferBatch(event: TransferBatchEvent): void {
@@ -137,6 +138,6 @@ export function handleTransferBatch(event: TransferBatchEvent): void {
   let ids = event.params.ids
   let to = event.params.to
   for (let i = 0; i < ids.length; i++) {
-    makeWrappedTransfer(blockNumber, transactionID, createEventID(event).concat('-').concat(i.toString()), ids[i].toHex(), to.toHex())
+    makeWrappedTransfer(blockNumber, transactionID, createEventID(event).concat('-').concat(i.toString()), ids[i], to.toHex())
   }
 }

@@ -4,7 +4,7 @@ import {
   ByteArray,
   ethereum
 } from '@graphprotocol/graph-ts'
-import { Account } from './types/schema'
+import { Account, Domain } from './types/schema'
 
 export function createEventID(event:  ethereum.Event): string {
   return event.block.number.toString().concat('-').concat(event.logIndex.toString())
@@ -50,4 +50,14 @@ export function createOrLoadAccount(address: string): Account {
   }
 
   return account
+}
+
+export function createOrLoadDomain(node: string): Domain {
+  let domain = Domain.load(node)
+  if (domain == null) {
+    domain = new Domain(node)
+    domain.save()
+  }
+
+  return domain
 }

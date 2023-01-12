@@ -18,7 +18,7 @@ import {
 } from './types/BaseRegistrar/BaseRegistrar'
 
 import {
-  NameRegistered as ControllerNameRegisteredEventOld,
+  NameRegistered as ControllerNameRegisteredEventOld
 } from './types/EthRegistrarControllerOld/EthRegistrarControllerOld'
 
 import {
@@ -45,8 +45,9 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
   registration.registrant = account.id
 
   let labelName = ens.nameByHash(label.toHexString())
-  if (labelName != null) {
+  if (labelName != null && checkValidLabel(labelName!, Bytes.fromByteArray(label))) {
     domain.labelName = labelName
+    domain.name = labelName + '.eth'
     registration.labelName = labelName
   }
   domain.save()
@@ -73,18 +74,26 @@ export function handleNameRenewedByController(event: ControllerNameRenewedEvent)
   setNamePreimage(event.params.name, event.params.label, event.params.cost);
 }
 
-function setNamePreimage(name: string, label: Bytes, cost: BigInt): void {
+function checkValidLabel(name: string, label: Bytes): boolean {
   const labelHash = crypto.keccak256(ByteArray.fromUTF8(name));
   if(!labelHash.equals(label)) {
     log.warning(
       "Expected '{}' to hash to {}, but got {} instead. Skipping.",
       [name, labelHash.toHex(), label.toHex()]
     );
-    return;
+    return false;
   }
 
   if(name.indexOf(".") !== -1) {
     log.warning("Invalid label '{}'. Skipping.", [name]);
+    return false;
+  }
+
+  return true;
+}
+
+function setNamePreimage(name: string, label: Bytes, cost: BigInt): void {
+  if (!checkValidLabel(name, label)) {
     return;
   }
 

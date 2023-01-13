@@ -45,7 +45,7 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
   registration.registrant = account.id
 
   let labelName = ens.nameByHash(label.toHexString())
-  if (labelName != null && checkValidLabel(labelName!, Bytes.fromByteArray(label))) {
+  if (labelName != null) {
     domain.labelName = labelName
     domain.name = labelName + '.eth'
     registration.labelName = labelName
@@ -74,26 +74,23 @@ export function handleNameRenewedByController(event: ControllerNameRenewedEvent)
   setNamePreimage(event.params.name, event.params.label, event.params.cost);
 }
 
-function checkValidLabel(name: string, label: Bytes): boolean {
-  const labelHash = crypto.keccak256(ByteArray.fromUTF8(name));
-  if(!labelHash.equals(label)) {
-    log.warning(
-      "Expected '{}' to hash to {}, but got {} instead. Skipping.",
-      [name, labelHash.toHex(), label.toHex()]
-    );
-    return false;
-  }
-
-  if(name.indexOf(".") !== -1) {
-    log.warning("Invalid label '{}'. Skipping.", [name]);
-    return false;
+function checkValidLabel(name: string): boolean {
+  for (let i = 0; i < name.length; i++) {
+    let c = name.charCodeAt(i);
+    if (c === 0) {
+      log.warning("Invalid label '{}' contained null byte. Skipping.", [name]);
+      return false;
+    } else if (c === 46) {
+      log.warning("Invalid label '{}' contained separator char '.'. Skipping.", [name]);
+      return false;
+    }
   }
 
   return true;
 }
 
 function setNamePreimage(name: string, label: Bytes, cost: BigInt): void {
-  if (!checkValidLabel(name, label)) {
+  if (!checkValidLabel(name)) {
     return;
   }
 

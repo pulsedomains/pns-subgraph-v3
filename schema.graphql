@@ -90,7 +90,14 @@ type FusesSet implements DomainEvent @entity {
   domain: Domain!
   blockNumber: Int!
   transactionID: Bytes!
-  fuses: BigInt!
+  fuses: Int!
+}
+
+type ExpiryExtended implements DomainEvent @entity {
+  id: ID!
+  domain: Domain!
+  blockNumber: Int!
+  transactionID: Bytes!
   expiry: BigInt!
 }
 
@@ -140,7 +147,7 @@ type NameTransferred implements RegistrationEvent @entity {
 type WrappedDomain @entity {
   id: ID!
   domain: Domain!
-  expiryDate: BigInt!
+  expiry: BigInt!
   fuses: BigInt!
   owner: Account!
   labelName: String

@@ -71,8 +71,8 @@ export function handleNameWrapped(event: NameWrappedEvent): void {
 
   let wrappedDomain = new WrappedDomain(node.toHex());
   wrappedDomain.domain = domain.id;
-  wrappedDomain.expiry = event.params.expiry;
-  wrappedDomain.fuses = fuses;
+  wrappedDomain.expiryDate = event.params.expiry;
+  wrappedDomain.fuses = fuses.toI32();
   wrappedDomain.owner = owner.id;
   wrappedDomain.labelName = name;
   wrappedDomain.save();
@@ -80,7 +80,7 @@ export function handleNameWrapped(event: NameWrappedEvent): void {
   let nameWrappedEvent = new NameWrapped(createEventID(event));
   nameWrappedEvent.domain = domain.id;
   nameWrappedEvent.name = name;
-  nameWrappedEvent.fuses = fuses;
+  nameWrappedEvent.fuses = fuses.toI32();
   nameWrappedEvent.owner = owner.id;
   nameWrappedEvent.blockNumber = blockNumber;
   nameWrappedEvent.transactionID = transactionID;
@@ -109,7 +109,7 @@ export function handleFusesSet(event: FusesSetEvent): void {
   let blockNumber = event.block.number.toI32();
   let transactionID = event.transaction.hash;
   let wrappedDomain = WrappedDomain.load(node.toHex())!;
-  wrappedDomain.fuses = fuses;
+  wrappedDomain.fuses = fuses.toI32();
   wrappedDomain.save();
   let fusesBurnedEvent = new FusesSet(createEventID(event));
   fusesBurnedEvent.domain = node.toHex();
@@ -125,11 +125,11 @@ export function handleExpiryExtended(event: ExpiryExtendedEvent): void {
   let blockNumber = event.block.number.toI32();
   let transactionID = event.transaction.hash;
   let wrappedDomain = WrappedDomain.load(node.toHex())!;
-  wrappedDomain.expiry = expiry;
+  wrappedDomain.expiryDate = expiry;
   wrappedDomain.save();
   let expiryExtendedEvent = new ExpiryExtended(createEventID(event));
   expiryExtendedEvent.domain = node.toHex();
-  expiryExtendedEvent.expiry = expiry;
+  expiryExtendedEvent.expiryDate = expiry;
   expiryExtendedEvent.blockNumber = blockNumber;
   expiryExtendedEvent.transactionID = transactionID;
   expiryExtendedEvent.save();

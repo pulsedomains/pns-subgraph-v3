@@ -72,9 +72,9 @@ type NameWrapped implements DomainEvent @entity {
   blockNumber: Int!
   transactionID: Bytes!
   name: String!
-  fuses: BigInt!
+  fuses: Int!
   owner: Account!
-  expiry: BigInt!
+  expiryDate: BigInt!
 }
 
 type NameUnwrapped implements DomainEvent @entity {
@@ -98,7 +98,7 @@ type ExpiryExtended implements DomainEvent @entity {
   domain: Domain!
   blockNumber: Int!
   transactionID: Bytes!
-  expiry: BigInt!
+  expiryDate: BigInt!
 }
 
 type Registration @entity {
@@ -147,8 +147,8 @@ type NameTransferred implements RegistrationEvent @entity {
 type WrappedDomain @entity {
   id: ID!
   domain: Domain!
-  expiry: BigInt!
-  fuses: BigInt!
+  expiryDate: BigInt!
+  fuses: Int!
   owner: Account!
   labelName: String
 }

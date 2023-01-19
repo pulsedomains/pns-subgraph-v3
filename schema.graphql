@@ -71,7 +71,7 @@ type NameWrapped implements DomainEvent @entity {
   domain: Domain!
   blockNumber: Int!
   transactionID: Bytes!
-  name: String!
+  name: String
   fuses: Int!
   owner: Account!
   expiryDate: BigInt!
@@ -150,7 +150,7 @@ type WrappedDomain @entity {
   expiryDate: BigInt!
   fuses: Int!
   owner: Account!
-  labelName: String
+  name: String
 }
 
 type Account @entity {

@@ -19,13 +19,14 @@ import {
   WrappedTransfer,
 } from "./types/schema";
 import {
+  checkValidLabel,
   concat,
   createEventID,
   createOrLoadAccount,
   createOrLoadDomain,
 } from "./utils";
 
-function decodeName(buf: Bytes): Array<string> {
+function decodeName(buf: Bytes): Array<string> | null {
   let offset = 0;
   let list = new ByteArray(0);
   let dot = Bytes.fromHexString("2e");
@@ -39,6 +40,10 @@ function decodeName(buf: Bytes): Array<string> {
   while (len) {
     let label = hex.slice((offset + 1) * 2, (offset + 1 + len) * 2);
     let labelBytes = Bytes.fromHexString(label);
+
+    if (!checkValidLabel(labelBytes.toString())) {
+      return null;
+    }
 
     if (offset > 1) {
       list = concat(list, dot);
@@ -54,8 +59,12 @@ function decodeName(buf: Bytes): Array<string> {
 
 export function handleNameWrapped(event: NameWrappedEvent): void {
   let decoded = decodeName(event.params.name);
-  let label = decoded[0];
-  let name = decoded[1];
+  let label: string | null = null;
+  let name: string | null = null;
+  if (decoded !== null) {
+    label = decoded[0];
+    name = decoded[1];
+  }
   let node = event.params.node;
   let fuses = event.params.fuses;
   let blockNumber = event.block.number.toI32();
@@ -63,7 +72,7 @@ export function handleNameWrapped(event: NameWrappedEvent): void {
   let owner = createOrLoadAccount(event.params.owner.toHex());
   let domain = createOrLoadDomain(node.toHex());
 
-  if (!domain.labelName) {
+  if (!domain.labelName && label) {
     domain.labelName = label;
     domain.name = name;
   }
@@ -74,7 +83,7 @@ export function handleNameWrapped(event: NameWrappedEvent): void {
   wrappedDomain.expiryDate = event.params.expiry;
   wrappedDomain.fuses = fuses.toI32();
   wrappedDomain.owner = owner.id;
-  wrappedDomain.labelName = name;
+  wrappedDomain.name = name;
   wrappedDomain.save();
 
   let nameWrappedEvent = new NameWrapped(createEventID(event));

@@ -1,6 +1,6 @@
 // Import types and APIs from graph-ts
 import {
-  Bytes, store, BigInt
+  Bytes, store, BigInt, ByteArray
 } from '@graphprotocol/graph-ts'
 // Import event types from the registry contract ABI
 import {
@@ -12,7 +12,7 @@ import { concat, createEventID, createOrLoadAccount, createOrLoadDomain } from '
 
 function decodeName (buf:Bytes):Array<string> {
   let offset = 0
-  let list = Bytes.fromHexString('')
+  let list = new ByteArray(0);
   let dot = Bytes.fromHexString('2e')
   let len = buf[offset++]
   let hex = buf.toHexString()

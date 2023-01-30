@@ -90,6 +90,7 @@ export function handleNameWrapped(event: NameWrappedEvent): void {
   nameWrappedEvent.domain = domain.id;
   nameWrappedEvent.name = name;
   nameWrappedEvent.fuses = fuses.toI32();
+  nameWrappedEvent.expiryDate = event.params.expiry;
   nameWrappedEvent.owner = owner.id;
   nameWrappedEvent.blockNumber = blockNumber;
   nameWrappedEvent.transactionID = transactionID;

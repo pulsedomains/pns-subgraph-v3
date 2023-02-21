@@ -1,5 +1,5 @@
 // Import types and APIs from graph-ts
-import { BigInt, ByteArray, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, ByteArray, ethereum, log } from "@graphprotocol/graph-ts";
 import { Account, Domain } from "./types/schema";
 
 export function createEventID(event: ethereum.Event): string {
@@ -63,4 +63,22 @@ export function createOrLoadDomain(node: string): Domain {
   }
 
   return domain;
+}
+
+export function checkValidLabel(name: string): boolean {
+  for (let i = 0; i < name.length; i++) {
+    let c = name.charCodeAt(i);
+    if (c === 0) {
+      log.warning("Invalid label '{}' contained null byte. Skipping.", [name]);
+      return false;
+    } else if (c === 46) {
+      log.warning(
+        "Invalid label '{}' contained separator char '.'. Skipping.",
+        [name]
+      );
+      return false;
+    }
+  }
+
+  return true;
 }

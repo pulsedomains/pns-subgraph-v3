@@ -1,15 +1,9 @@
 // Import types and APIs from graph-ts
-import {
-  BigInt,
-  ByteArray,
-  Bytes,
-  crypto,
-  ens,
-  log,
-} from "@graphprotocol/graph-ts";
+import { BigInt, ByteArray, Bytes, crypto, ens } from "@graphprotocol/graph-ts";
 
 import {
   byteArrayFromHex,
+  checkValidLabel,
   concat,
   createEventID,
   uint256ToByteArray,
@@ -94,24 +88,6 @@ export function handleNameRenewedByController(
   event: ControllerNameRenewedEvent
 ): void {
   setNamePreimage(event.params.name, event.params.label, event.params.cost);
-}
-
-function checkValidLabel(name: string): boolean {
-  for (let i = 0; i < name.length; i++) {
-    let c = name.charCodeAt(i);
-    if (c === 0) {
-      log.warning("Invalid label '{}' contained null byte. Skipping.", [name]);
-      return false;
-    } else if (c === 46) {
-      log.warning(
-        "Invalid label '{}' contained separator char '.'. Skipping.",
-        [name]
-      );
-      return false;
-    }
-  }
-
-  return true;
 }
 
 function setNamePreimage(name: string, label: Bytes, cost: BigInt): void {

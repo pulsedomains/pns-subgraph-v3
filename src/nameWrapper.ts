@@ -2,6 +2,7 @@
 import { BigInt, ByteArray, Bytes, store } from "@graphprotocol/graph-ts";
 // Import event types from the registry contract ABI
 import {
+  ExpiryExtended as ExpiryExtendedEvent,
   FusesSet as FusesSetEvent,
   NameUnwrapped as NameUnwrappedEvent,
   NameWrapped as NameWrappedEvent,
@@ -10,6 +11,7 @@ import {
 } from "./types/NameWrapper/NameWrapper";
 // Import entity types generated from the GraphQL schema
 import {
+  ExpiryExtended,
   FusesSet,
   NameUnwrapped,
   NameWrapped,
@@ -17,13 +19,14 @@ import {
   WrappedTransfer,
 } from "./types/schema";
 import {
+  checkValidLabel,
   concat,
   createEventID,
   createOrLoadAccount,
   createOrLoadDomain,
 } from "./utils";
 
-function decodeName(buf: Bytes): Array<string> {
+function decodeName(buf: Bytes): Array<string> | null {
   let offset = 0;
   let list = new ByteArray(0);
   let dot = Bytes.fromHexString("2e");
@@ -37,6 +40,10 @@ function decodeName(buf: Bytes): Array<string> {
   while (len) {
     let label = hex.slice((offset + 1) * 2, (offset + 1 + len) * 2);
     let labelBytes = Bytes.fromHexString(label);
+
+    if (!checkValidLabel(labelBytes.toString())) {
+      return null;
+    }
 
     if (offset > 1) {
       list = concat(list, dot);
@@ -52,8 +59,12 @@ function decodeName(buf: Bytes): Array<string> {
 
 export function handleNameWrapped(event: NameWrappedEvent): void {
   let decoded = decodeName(event.params.name);
-  let label = decoded[0];
-  let name = decoded[1];
+  let label: string | null = null;
+  let name: string | null = null;
+  if (decoded !== null) {
+    label = decoded[0];
+    name = decoded[1];
+  }
   let node = event.params.node;
   let fuses = event.params.fuses;
   let blockNumber = event.block.number.toI32();
@@ -61,7 +72,7 @@ export function handleNameWrapped(event: NameWrappedEvent): void {
   let owner = createOrLoadAccount(event.params.owner.toHex());
   let domain = createOrLoadDomain(node.toHex());
 
-  if (!domain.labelName) {
+  if (!domain.labelName && label) {
     domain.labelName = label;
     domain.name = name;
   }
@@ -70,15 +81,16 @@ export function handleNameWrapped(event: NameWrappedEvent): void {
   let wrappedDomain = new WrappedDomain(node.toHex());
   wrappedDomain.domain = domain.id;
   wrappedDomain.expiryDate = event.params.expiry;
-  wrappedDomain.fuses = fuses;
+  wrappedDomain.fuses = fuses.toI32();
   wrappedDomain.owner = owner.id;
-  wrappedDomain.labelName = name;
+  wrappedDomain.name = name;
   wrappedDomain.save();
 
   let nameWrappedEvent = new NameWrapped(createEventID(event));
   nameWrappedEvent.domain = domain.id;
   nameWrappedEvent.name = name;
-  nameWrappedEvent.fuses = fuses;
+  nameWrappedEvent.fuses = fuses.toI32();
+  nameWrappedEvent.expiryDate = event.params.expiry;
   nameWrappedEvent.owner = owner.id;
   nameWrappedEvent.blockNumber = blockNumber;
   nameWrappedEvent.transactionID = transactionID;
@@ -104,19 +116,33 @@ export function handleNameUnwrapped(event: NameUnwrappedEvent): void {
 export function handleFusesSet(event: FusesSetEvent): void {
   let node = event.params.node;
   let fuses = event.params.fuses;
+  let blockNumber = event.block.number.toI32();
+  let transactionID = event.transaction.hash;
+  let wrappedDomain = WrappedDomain.load(node.toHex())!;
+  wrappedDomain.fuses = fuses.toI32();
+  wrappedDomain.save();
+  let fusesBurnedEvent = new FusesSet(createEventID(event));
+  fusesBurnedEvent.domain = node.toHex();
+  fusesBurnedEvent.fuses = fuses.toI32();
+  fusesBurnedEvent.blockNumber = blockNumber;
+  fusesBurnedEvent.transactionID = transactionID;
+  fusesBurnedEvent.save();
+}
+
+export function handleExpiryExtended(event: ExpiryExtendedEvent): void {
+  let node = event.params.node;
   let expiry = event.params.expiry;
   let blockNumber = event.block.number.toI32();
   let transactionID = event.transaction.hash;
   let wrappedDomain = WrappedDomain.load(node.toHex())!;
-  wrappedDomain.fuses = fuses;
   wrappedDomain.expiryDate = expiry;
   wrappedDomain.save();
-  let fusesBurnedEvent = new FusesSet(createEventID(event));
-  fusesBurnedEvent.domain = node.toHex();
-  fusesBurnedEvent.fuses = fuses;
-  fusesBurnedEvent.blockNumber = blockNumber;
-  fusesBurnedEvent.transactionID = transactionID;
-  fusesBurnedEvent.save();
+  let expiryExtendedEvent = new ExpiryExtended(createEventID(event));
+  expiryExtendedEvent.domain = node.toHex();
+  expiryExtendedEvent.expiryDate = expiry;
+  expiryExtendedEvent.blockNumber = blockNumber;
+  expiryExtendedEvent.transactionID = transactionID;
+  expiryExtendedEvent.save();
 }
 
 function makeWrappedTransfer(

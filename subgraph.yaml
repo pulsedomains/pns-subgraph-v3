@@ -157,8 +157,10 @@ dataSources:
           handler: handleNameWrapped
         - event: "NameUnwrapped(indexed bytes32,address)"
           handler: handleNameUnwrapped
-        - event: "FusesSet(indexed bytes32,uint32,uint64)"
+        - event: "FusesSet(indexed bytes32,uint32)"
           handler: handleFusesSet
+        - event: "ExpiryExtended(indexed bytes32,uint64)"
+          handler: handleExpiryExtended
         - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
           handler: handleTransferSingle
         - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])

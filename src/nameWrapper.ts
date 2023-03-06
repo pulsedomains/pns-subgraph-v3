@@ -118,9 +118,11 @@ export function handleFusesSet(event: FusesSetEvent): void {
   let fuses = event.params.fuses;
   let blockNumber = event.block.number.toI32();
   let transactionID = event.transaction.hash;
-  let wrappedDomain = WrappedDomain.load(node.toHex())!;
-  wrappedDomain.fuses = fuses.toI32();
-  wrappedDomain.save();
+  let wrappedDomain = WrappedDomain.load(node.toHex());
+  if (wrappedDomain) {
+    wrappedDomain.fuses = fuses.toI32();
+    wrappedDomain.save();
+  }
   let fusesBurnedEvent = new FusesSet(createEventID(event));
   fusesBurnedEvent.domain = node.toHex();
   fusesBurnedEvent.fuses = fuses.toI32();
@@ -134,9 +136,11 @@ export function handleExpiryExtended(event: ExpiryExtendedEvent): void {
   let expiry = event.params.expiry;
   let blockNumber = event.block.number.toI32();
   let transactionID = event.transaction.hash;
-  let wrappedDomain = WrappedDomain.load(node.toHex())!;
-  wrappedDomain.expiryDate = expiry;
-  wrappedDomain.save();
+  let wrappedDomain = WrappedDomain.load(node.toHex());
+  if (wrappedDomain) {
+    wrappedDomain.expiryDate = expiry;
+    wrappedDomain.save();
+  }
   let expiryExtendedEvent = new ExpiryExtended(createEventID(event));
   expiryExtendedEvent.domain = node.toHex();
   expiryExtendedEvent.expiryDate = expiry;

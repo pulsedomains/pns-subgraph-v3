@@ -59,11 +59,6 @@ Here we have example queries, so that you don't have to type them in yourself ea
         interfaceID
         implementer
       }
-      ... on AuthorisationChanged {
-        owner
-        target
-        isAuthorized
-      }
     }
   }
   registrations(where: { labelName_not: null }, orderBy: expiryDate, orderDirection: asc, first: 10, skip: 0) {

@@ -16,9 +16,9 @@ import { NameRegistered as NameRegisteredByController } from "../src/types/EthRe
 import { Registration } from "../src/types/schema";
 
 const ETH_NAMEHASH =
-  "0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae";
+  "0x55fb31aa6f23709345f51ac8d7e4ed79336defe55be2733bc226ed0f1f62f3c8";
 
-const DEFAULT_OWNER = "0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7";
+const DEFAULT_OWNER = "0xF7cC551106A1f4E2843A3DA0C477B6f77FA4a09d";
 
 const createNameRegisteredByControllerEvent = (
   name: string,
@@ -146,7 +146,7 @@ const createNameRegisteredEvent = (
 
 beforeAll(() => {
   const ethLabelhash =
-    "0x4f5b812789fc606be1b3b16908db13fc7a9adf7ca72641f84d75b47069d3d7f0";
+    "0xc26659bcd13c5b01c7a71e39e3fd1cdb5fe4d29361f167299bc82ba929a1aa4b";
   const emptyNode =
     "0x0000000000000000000000000000000000000000000000000000000000000000";
   const newNewOwnerEvent = createNewOwnerEvent(

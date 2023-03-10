@@ -84,6 +84,11 @@
     "type": "error"
   },
   {
+    "inputs": [],
+    "name": "MaximumBasisPoints",
+    "type": "error"
+  },
+  {
     "inputs": [
       {
         "internalType": "string",
@@ -238,6 +243,19 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "_newBasisPoints",
+        "type": "uint256"
+      }
+    ],
+    "name": "changeReferralBasisPoints",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "bytes32",
         "name": "commitment",
         "type": "bytes32"
@@ -270,44 +288,56 @@
   {
     "inputs": [
       {
-        "internalType": "string",
-        "name": "name",
-        "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "duration",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "secret",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "resolver",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes[]",
-        "name": "data",
-        "type": "bytes[]"
-      },
-      {
-        "internalType": "bool",
-        "name": "reverseRecord",
-        "type": "bool"
-      },
-      {
-        "internalType": "uint16",
-        "name": "ownerControlledFuses",
-        "type": "uint16"
+        "components": [
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "duration",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "secret",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "resolver",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes[]",
+            "name": "data",
+            "type": "bytes[]"
+          },
+          {
+            "internalType": "bool",
+            "name": "reverseRecord",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint16",
+            "name": "ownerControlledFuses",
+            "type": "uint16"
+          },
+          {
+            "internalType": "address",
+            "name": "referrer",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct IETHRegistrarController.Registration",
+        "name": "params",
+        "type": "tuple"
       }
     ],
     "name": "makeCommitment",
@@ -410,46 +440,71 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "name",
-        "type": "string"
-      },
-      {
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
+    "inputs": [],
+    "name": "referralFeeBasisPoints",
+    "outputs": [
       {
         "internalType": "uint256",
-        "name": "duration",
+        "name": "",
         "type": "uint256"
-      },
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
       {
-        "internalType": "bytes32",
-        "name": "secret",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "resolver",
-        "type": "address"
-      },
-      {
-        "internalType": "bytes[]",
-        "name": "data",
-        "type": "bytes[]"
-      },
-      {
-        "internalType": "bool",
-        "name": "reverseRecord",
-        "type": "bool"
-      },
-      {
-        "internalType": "uint16",
-        "name": "ownerControlledFuses",
-        "type": "uint16"
+        "components": [
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "duration",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "secret",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "resolver",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes[]",
+            "name": "data",
+            "type": "bytes[]"
+          },
+          {
+            "internalType": "bool",
+            "name": "reverseRecord",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint16",
+            "name": "ownerControlledFuses",
+            "type": "uint16"
+          },
+          {
+            "internalType": "address",
+            "name": "referrer",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct IETHRegistrarController.Registration",
+        "name": "params",
+        "type": "tuple"
       }
     ],
     "name": "register",

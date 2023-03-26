@@ -12,7 +12,7 @@
     "local:remove": "graph remove graphprotocol/pns --node http://127.0.0.1:8020",
     "server:setup": "yarn codegen && yarn server:create-local && yarn server:deploy-local",
     "server:create": "graph create graphprotocol/tpns --node https://graph-node.pulse.domains",
-    "server:deploy": "graph deploy graphprotocol/tpns --debug --ipfs https://ipfs.pulse.domains --node https://graph-node.pulse.domains --version-label 1.0.2",
+    "server:deploy": "graph deploy graphprotocol/tpns --debug --ipfs https://ipfs.pulse.domains --node https://graph-node.pulse.domains --version-label 1.0.0",
     "server:remove": "graph remove graphprotocol/tpns --node https://graph-node.pulse.domains",
     "build": "graph build",
     "deploy": "graph deploy graphprotocol/tpns --ipfs https://ipfs.pulse.domains --node https://graph-node.pulse.domains"

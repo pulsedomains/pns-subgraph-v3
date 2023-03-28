@@ -197,7 +197,7 @@ export function handleNewResolver(event: NewResolverEvent): void {
   domainEvent.blockNumber = event.block.number.toI32();
   domainEvent.transactionID = event.transaction.hash;
   domainEvent.domain = node;
-  domainEvent.resolver = id || EMPTY_ADDRESS;
+  domainEvent.resolver = id ? id : EMPTY_ADDRESS;
   domainEvent.save();
 }
 

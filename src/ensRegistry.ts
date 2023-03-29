@@ -176,6 +176,7 @@ export function handleNewResolver(event: NewResolverEvent): void {
     resolver.domain = event.params.node.toHexString();
     resolver.address = event.params.resolver;
     resolver.save();
+    domain.resolvedAddress = null
   } else {
     domain.resolvedAddress = resolver.addr;
   }

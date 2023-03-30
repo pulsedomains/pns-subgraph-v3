@@ -185,6 +185,8 @@ export function handleNewResolver(event: NewResolverEvent): void {
       resolver.domain = event.params.node.toHexString();
       resolver.address = event.params.resolver;
       resolver.save();
+      // since this is a new resolver entity, there can't be a resolved address yet so set to null
+      domain.resolvedAddress = null;
     } else {
       domain.resolvedAddress = resolver.addr;
     }

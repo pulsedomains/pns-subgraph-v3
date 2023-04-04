@@ -75,3 +75,5 @@ typings/
 
 .vscode
 /tests/.bin
+
+subgraph.yaml

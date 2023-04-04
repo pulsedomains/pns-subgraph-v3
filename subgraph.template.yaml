@@ -9,11 +9,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: ENSRegistry
-    network: pulsechain
+    network: {{network}}
     source:
-      address: "0x0893847a9a665C8DE13a7D09D991e403d9047249"
+      address: "{{ENSRegistry.Address}}"
       abi: EnsRegistry
-      startBlock: 16745466
+      startBlock: {{ENSRegistry.StartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -37,11 +37,11 @@ dataSources:
           handler: handleNewTTL
   - kind: ethereum/contract
     name: Resolver
-    network: pulsechain
+    network: {{network}}
     source:
-      address: "0x77d15a0954d0550606EB4556021080Ddc678741a"
+      address: "{{Resolver.Address}}"
       abi: Resolver
-      startBlock: 16745521
+      startBlock: {{Resolver.StartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -80,11 +80,11 @@ dataSources:
           handler: handleVersionChanged
   - kind: ethereum/contract
     name: BaseRegistrar
-    network: pulsechain
+    network: {{network}}
     source:
-      address: "0x1Bc78C29592Ec5dB2e88a42340Db4B262F16da97"
+      address: "{{BaseRegistrar.Address}}"
       abi: BaseRegistrar
-      startBlock: 16745485
+      startBlock: {{BaseRegistrar.StartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -107,11 +107,11 @@ dataSources:
           handler: handleNameTransferred
   - kind: ethereum/contract
     name: EthRegistrarController
-    network: pulsechain
+    network: {{network}}
     source:
-      address: "0xC0A474ffCDEAF8D276b191C10B52790A18b87154"
+      address: "{{EthRegistrarController.Address}}"
       abi: EthRegistrarController
-      startBlock: 16745513
+      startBlock: {{EthRegistrarController.StartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -131,11 +131,11 @@ dataSources:
           handler: handleNameRenewedByController
   - kind: ethereum/contract
     name: NameWrapper
-    network: pulsechain
+    network: {{network}}
     source:
-      address: "0xC8eB37b0411647C3cd17fA2F0Adb134B8Ef49425"
+      address: "{{NameWrapper.Address}}"
       abi: NameWrapper
-      startBlock: 16745508
+      startBlock: {{NameWrapper.StartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5

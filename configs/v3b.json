@@ -1,0 +1,23 @@
+{
+  "network": "pulsechain",
+  "ENSRegistry": {
+    "Address": "0x0893847a9a665C8DE13a7D09D991e403d9047249",
+    "StartBlock": 16745466
+  },
+  "Resolver": {
+    "Address": "0x77d15a0954d0550606EB4556021080Ddc678741a",
+    "StartBlock": 16745521
+  },
+  "BaseRegistrar": {
+    "Address": "0x1Bc78C29592Ec5dB2e88a42340Db4B262F16da97",
+    "StartBlock": 16745485
+  },
+  "EthRegistrarController": {
+    "Address": "0xC0A474ffCDEAF8D276b191C10B52790A18b87154",
+    "StartBlock": 16745513
+  },
+  "NameWrapper": {
+    "Address": "0xC8eB37b0411647C3cd17fA2F0Adb134B8Ef49425",
+    "StartBlock": 16745508
+  }
+}

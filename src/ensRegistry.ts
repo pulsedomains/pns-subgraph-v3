@@ -161,23 +161,37 @@ export function handleTransfer(event: TransferEvent): void {
 
 // Handler for NewResolver events
 export function handleNewResolver(event: NewResolverEvent): void {
-  let id = event.params.resolver
-    .toHexString()
-    .concat("-")
-    .concat(event.params.node.toHexString());
+  let id: string | null;
+
+  // if resolver is set to 0x0, set id to null
+  // we don't want to create a resolver entity for 0x0
+  if (event.params.resolver.toHexString() === EMPTY_ADDRESS) {
+    id = null;
+  } else {
+    id = event.params.resolver
+      .toHexString()
+      .concat("-")
+      .concat(event.params.node.toHexString());
+  }
 
   let node = event.params.node.toHexString();
   let domain = getDomain(node)!;
   domain.resolver = id;
 
-  let resolver = Resolver.load(id);
-  if (resolver == null) {
-    resolver = new Resolver(id);
-    resolver.domain = event.params.node.toHexString();
-    resolver.address = event.params.resolver;
-    resolver.save();
+  if (id) {
+    let resolver = Resolver.load(id);
+    if (resolver == null) {
+      resolver = new Resolver(id);
+      resolver.domain = event.params.node.toHexString();
+      resolver.address = event.params.resolver;
+      resolver.save();
+      // since this is a new resolver entity, there can't be a resolved address yet so set to null
+      domain.resolvedAddress = null;
+    } else {
+      domain.resolvedAddress = resolver.addr;
+    }
   } else {
-    domain.resolvedAddress = resolver.addr;
+    domain.resolvedAddress = null;
   }
   saveDomain(domain);
 
@@ -185,7 +199,7 @@ export function handleNewResolver(event: NewResolverEvent): void {
   domainEvent.blockNumber = event.block.number.toI32();
   domainEvent.transactionID = event.transaction.hash;
   domainEvent.domain = node;
-  domainEvent.resolver = id;
+  domainEvent.resolver = id ? id : EMPTY_ADDRESS;
   domainEvent.save();
 }
 
@@ -210,34 +224,4 @@ export function handleNewTTL(event: NewTTLEvent): void {
 
 export function handleNewOwner(event: NewOwnerEvent): void {
   _handleNewOwner(event, true);
-}
-
-export function handleNewOwnerOldRegistry(event: NewOwnerEvent): void {
-  let subnode = makeSubnode(event);
-  let domain = getDomain(subnode);
-
-  if (domain == null || domain.isMigrated == false) {
-    _handleNewOwner(event, false);
-  }
-}
-
-export function handleNewResolverOldRegistry(event: NewResolverEvent): void {
-  let node = event.params.node.toHexString();
-  let domain = getDomain(node, event.block.timestamp)!;
-  if (node == ROOT_NODE || !domain.isMigrated) {
-    handleNewResolver(event);
-  }
-}
-export function handleNewTTLOldRegistry(event: NewTTLEvent): void {
-  let domain = getDomain(event.params.node.toHexString())!;
-  if (domain.isMigrated == false) {
-    handleNewTTL(event);
-  }
-}
-
-export function handleTransferOldRegistry(event: TransferEvent): void {
-  let domain = getDomain(event.params.node.toHexString())!;
-  if (domain.isMigrated == false) {
-    handleTransfer(event);
-  }
 }

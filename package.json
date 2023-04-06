@@ -6,16 +6,17 @@
   "scripts": {
     "codegen": "graph codegen --output-dir src/types/",
     "test": "graph test",
-    "setup": "yarn codegen && yarn create-local && yarn deploy-local",
-    "local:create": "graph create graphprotocol/pns --node http://127.0.0.1:8020",
-    "local:deploy": "graph deploy graphprotocol/pns --debug --ipfs http://127.0.0.1:5001 --node http://127.0.0.1:8020/ --version-label 0.0.1",
-    "local:remove": "graph remove graphprotocol/pns --node http://127.0.0.1:8020",
-    "server:setup": "yarn codegen && yarn server:create-local && yarn server:deploy-local",
-    "server:create": "graph create graphprotocol/tpns --node https://graph-node.pulse.domains",
-    "server:deploy": "graph deploy graphprotocol/tpns --debug --ipfs https://ipfs.pulse.domains --node https://graph-node.pulse.domains --version-label 1.0.2",
-    "server:remove": "graph remove graphprotocol/tpns --node https://graph-node.pulse.domains",
     "build": "graph build",
-    "deploy": "graph deploy graphprotocol/tpns --ipfs https://ipfs.pulse.domains --node https://graph-node.pulse.domains"
+    "setup:v3b": "yarn codegen && yarn prepare:3vb && yarn create:v3b && yarn deploy:v3b",
+    "prepare:v3b": "mustache configs/v3b.json subgraph.template.yaml > subgraph.yaml",
+    "create:v3b": "graph create graphprotocol/tpns --node https://v3b.graph-node.pulse.domains",
+    "deploy:v3b": "graph deploy graphprotocol/tpns --debug --ipfs https://v3b.ipfs.pulse.domains --node https://v3b.graph-node.pulse.domains --version-label 1.0.0",
+    "remove:v3b": "graph remove graphprotocol/tpns --node https://v3b.graph-node.pulse.domains",
+    "setup:main": "yarn codegen && yarn prepare:main && yarn create:main && yarn deploy:main",
+    "prepare:main": "mustache configs/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "create:main": "graph create graphprotocol/pns --node https://graph-node.pulse.domains",
+    "deploy:main": "graph deploy graphprotocol/pns --debug --ipfs https://ipfs.pulse.domains --node https://graph-node.pulse.domains --version-label 1.0.0",
+    "remove:main": "graph remove graphprotocol/pns --node https://graph-node.pulse.domains"
   },
   "devDependencies": {
     "@ensdomains/content-hash": "^2.5.3",
@@ -23,6 +24,7 @@
     "@graphprotocol/graph-ts": "^0.29.1",
     "assemblyscript": "^0.26.3",
     "matchstick-as": "^0.5.0",
+    "mustache": "^4.2.0",
     "typescript": "^4.9.4"
   }
 }

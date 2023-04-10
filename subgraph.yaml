@@ -1,4 +1,4 @@
-specVersion: 0.0.3
+specVersion: 0.0.4
 description: >-
   A secure & decentralized way to address resources on and off the blockchain
   using simple, human-readable names. Access domains and transfer history.
@@ -15,7 +15,7 @@ dataSources:
       startBlock: 9380380
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/ensRegistry.ts
       entities:
@@ -43,7 +43,7 @@ dataSources:
       startBlock: 3327417
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/ensRegistry.ts
       entities:
@@ -69,7 +69,7 @@ dataSources:
       abi: Resolver
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/resolver.ts
       entities:
@@ -119,7 +119,7 @@ dataSources:
       startBlock: 9380410
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/ethRegistrar.ts
       entities:
@@ -146,7 +146,7 @@ dataSources:
       startBlock: 9380471
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/ethRegistrar.ts
       entities:
@@ -170,7 +170,7 @@ dataSources:
       startBlock: 16925618
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/ethRegistrar.ts
       entities:
@@ -194,7 +194,7 @@ dataSources:
       startBlock: 16925608
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/nameWrapper.ts
       entities:

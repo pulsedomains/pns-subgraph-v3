@@ -53,7 +53,7 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
   let labelName = ens.nameByHash(label.toHexString());
   if (labelName != null) {
     domain.labelName = labelName;
-    domain.name = labelName + ".eth";
+    domain.name = labelName! + ".eth";
     registration.labelName = labelName;
   }
   domain.save();

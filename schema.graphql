@@ -1,30 +1,30 @@
 type Domain @entity {
   "The namehash of the name"
-  id: ID! 
+  id: ID!
   "The human readable name, if known. Unknown portions replaced with hash in square brackets (eg, foo.[1234].eth)"
-  name: String 
+  name: String
   "The human readable label name (imported from CSV), if known"
-  labelName: String 
+  labelName: String
   "keccak256(labelName)"
-  labelhash: Bytes 
+  labelhash: Bytes
   "The namehash (id) of the parent name"
-  parent: Domain 
+  parent: Domain
   "Can count domains from length of array"
-  subdomains: [Domain!]! @derivedFrom(field: "parent")  
+  subdomains: [Domain!]! @derivedFrom(field: "parent")
   "The number of subdomains"
-  subdomainCount: Int!  
+  subdomainCount: Int!
   "Address logged from current resolver, if any"
-  resolvedAddress: Account                             
+  resolvedAddress: Account
   "The account that owns the domain"
-  owner: Account! 
+  owner: Account!
   "The resolver that controls the domain's settings"
-  resolver: Resolver 
+  resolver: Resolver
   "The time-to-live (TTL) value of the domain's records"
-  ttl: BigInt 
+  ttl: BigInt
   "Indicates whether the domain has been migrated to a new registrar"
-  isMigrated: Boolean! 
+  isMigrated: Boolean!
   "The time when the domain was created"
-  createdAt: BigInt! 
+  createdAt: BigInt!
   "The events associated with the domain"
   events: [DomainEvent!]! @derivedFrom(field: "domain")
   "The registration associated with the domain"
@@ -111,7 +111,7 @@ type WrappedTransfer implements DomainEvent @entity {
   owner: Account!
 }
 
-type WrappedDomain implements Domain @entity {
+type NameWrapped implements DomainEvent @entity {
   "The unique identifier of the wrapped domain"
   id: ID!
   "The domain name associated with the wrapped domain"
@@ -129,7 +129,6 @@ type WrappedDomain implements Domain @entity {
   "The expiry date of the wrapped domain registration"
   expiryDate: BigInt!
 }
-
 
 type NameUnwrapped implements DomainEvent @entity {
   "The unique identifier of the event"
@@ -245,15 +244,15 @@ type WrappedDomain @entity {
   "unique identifier for each instance of the WrappedDomain entity"
   id: ID!
   "The domain that is wrapped by this WrappedDomain"
-  domain: Domain! 
+  domain: Domain!
   "The expiry date of the wrapped domain"
-  expiryDate: BigInt! 
+  expiryDate: BigInt!
   "The number of fuses remaining on the wrapped domain"
-  fuses: Int! 
+  fuses: Int!
   "The account that owns this WrappedDomain"
-  owner: Account! 
+  owner: Account!
   "The name of the wrapped domain"
-  name: String 
+  name: String
 }
 
 type Account @entity {
@@ -269,19 +268,19 @@ type Account @entity {
 
 type Resolver @entity {
   "The unique identifier for this resolver, which is a concatenation of the resolver address and the domain namehash"
-  id: ID! 
+  id: ID!
   "The domain that this resolver is associated with"
   domain: Domain
   "The address of the resolver contract"
-  address: Bytes! 
+  address: Bytes!
   "The current value of the 'addr' record for this resolver, as determined by the associated events"
-  addr: Account 
+  addr: Account
   "The content hash for this resolver, in binary format"
-  contentHash: Bytes 
+  contentHash: Bytes
   "The set of observed text record keys for this resolver"
-  texts: [String!] 
+  texts: [String!]
   "The set of observed SLIP-44 coin types for this resolver"
-  coinTypes: [BigInt!]      
+  coinTypes: [BigInt!]
   "The events associated with this resolver"
   events: [ResolverEvent!]! @derivedFrom(field: "resolver")
 }
@@ -340,7 +339,7 @@ type NameChanged implements ResolverEvent @entity {
 
 type AbiChanged implements ResolverEvent @entity {
   "Concatenation of block number and log ID"
-  id: ID! 
+  id: ID!
   "Used to derive relationships to Resolvers"
   resolver: Resolver!
   "The block number at which the event was emitted"
@@ -378,7 +377,7 @@ type TextChanged implements ResolverEvent @entity {
   "The key of the text record that was changed"
   key: String!
   "The new value of the text record that was changed"
-  value: String!
+  value: String
 }
 
 type ContenthashChanged implements ResolverEvent @entity {

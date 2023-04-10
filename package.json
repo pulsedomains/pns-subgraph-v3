@@ -7,7 +7,7 @@
     "codegen": "graph codegen --output-dir src/types/",
     "test": "graph test",
     "setup": "yarn codegen && yarn create-local && yarn deploy-local",
-    "create-local": "graph create ensdomains/ens --node http://127.0.0.1:8020",
+    "create-local": "graph create graphprotocol/ens --node http://127.0.0.1:8020",
     "deploy-local": "graph deploy graphprotocol/ens --debug --ipfs http://localhost:5001 --node http://127.0.0.1:8020/ --version-label 0.0.1",
     "remove-local": "graph remove graphprotocol/ens --node http://127.0.0.1:8020",
     "docker:setup": "yarn codegen && yarn docker:create-local && yarn docker:deploy-local",

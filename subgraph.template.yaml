@@ -15,7 +15,7 @@ dataSources:
       startBlock: {{ENSRegistry.StartBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/ensRegistry.ts
       entities:
@@ -43,7 +43,7 @@ dataSources:
       startBlock: {{Resolver.StartBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/resolver.ts
       entities:
@@ -86,7 +86,7 @@ dataSources:
       startBlock: {{BaseRegistrar.StartBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/ethRegistrar.ts
       entities:
@@ -113,7 +113,7 @@ dataSources:
       startBlock: {{EthRegistrarController.StartBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/ethRegistrar.ts
       entities:
@@ -137,7 +137,7 @@ dataSources:
       startBlock: {{NameWrapper.StartBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/nameWrapper.ts
       entities:

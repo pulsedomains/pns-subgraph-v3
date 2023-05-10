@@ -17,6 +17,10 @@ type Domain @entity {
   resolvedAddress: Account
   "The account that owns the domain"
   owner: Account!
+  "The account that owns the ERC721 NFT for the domain"
+  registrant: Account
+  "The account that owns the wrapped domain"
+  wrappedOwner: Account
   "The resolver that controls the domain's settings"
   resolver: Resolver
   "The time-to-live (TTL) value of the domain's records"

@@ -76,6 +76,7 @@ export function handleNameWrapped(event: NameWrappedEvent): void {
     domain.labelName = label;
     domain.name = name;
   }
+  domain.wrappedOwner = owner.id;
   domain.save();
 
   let wrappedDomain = new WrappedDomain(node.toHex());
@@ -102,6 +103,10 @@ export function handleNameUnwrapped(event: NameUnwrappedEvent): void {
   let blockNumber = event.block.number.toI32();
   let transactionID = event.transaction.hash;
   let owner = createOrLoadAccount(event.params.owner.toHex());
+
+  let domain = createOrLoadDomain(node.toHex());
+  domain.wrappedOwner = null;
+  domain.save();
 
   let nameUnwrappedEvent = new NameUnwrapped(createEventID(event));
   nameUnwrappedEvent.domain = node.toHex();
@@ -169,9 +174,16 @@ function makeWrappedTransfer(
   // so we need to create the WrappedDomain entity here
   if (wrappedDomain == null) {
     wrappedDomain = new WrappedDomain(namehash);
+    wrappedDomain.domain = domain.id;
+
+    // placeholders until we get the NameWrapped event
+    wrappedDomain.expiryDate = BigInt.fromI32(0);
+    wrappedDomain.fuses = 0;
   }
   wrappedDomain.owner = _to.id;
   wrappedDomain.save();
+  domain.wrappedOwner = _to.id;
+  domain.save();
   const wrappedTransfer = new WrappedTransfer(eventID);
   wrappedTransfer.domain = domain.id;
   wrappedTransfer.blockNumber = blockNumber;

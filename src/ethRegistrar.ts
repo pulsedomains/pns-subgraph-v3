@@ -50,6 +50,8 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
   registration.expiryDate = event.params.expires;
   registration.registrant = account.id;
 
+  domain.registrant = account.id;
+
   let labelName = ens.nameByHash(label.toHexString());
   if (labelName != null) {
     domain.labelName = labelName;
@@ -131,7 +133,12 @@ export function handleNameTransferred(event: TransferEvent): void {
   let registration = Registration.load(label.toHex());
   if (registration == null) return;
 
+  let domain = Domain.load(crypto.keccak256(concat(rootNode, label)).toHex())!;
+
   registration.registrant = account.id;
+  domain.registrant = account.id;
+
+  domain.save();
   registration.save();
 
   let transferEvent = new NameTransferred(createEventID(event));

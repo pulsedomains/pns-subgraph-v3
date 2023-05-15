@@ -24,6 +24,7 @@ import {
   createEventID,
   createOrLoadAccount,
   createOrLoadDomain,
+  ETH_NODE,
 } from "./utils";
 
 function decodeName(buf: Bytes): Array<string> | null {
@@ -57,6 +58,12 @@ function decodeName(buf: Bytes): Array<string> | null {
   return [firstLabel, list.toString()];
 }
 
+const PARENT_CANNOT_CONTROL: i32 = 65536;
+
+function checkPccBurned(fuses: i32): boolean {
+  return (fuses & PARENT_CANNOT_CONTROL) == PARENT_CANNOT_CONTROL;
+}
+
 export function handleNameWrapped(event: NameWrappedEvent): void {
   let decoded = decodeName(event.params.name);
   let label: string | null = null;
@@ -66,7 +73,8 @@ export function handleNameWrapped(event: NameWrappedEvent): void {
     name = decoded[1];
   }
   let node = event.params.node;
-  let fuses = event.params.fuses;
+  let expiryDate = event.params.expiry;
+  let fuses = event.params.fuses.toI32();
   let blockNumber = event.block.number.toI32();
   let transactionID = event.transaction.hash;
   let owner = createOrLoadAccount(event.params.owner.toHex());
@@ -76,13 +84,19 @@ export function handleNameWrapped(event: NameWrappedEvent): void {
     domain.labelName = label;
     domain.name = name;
   }
+  if (
+    checkPccBurned(fuses) &&
+    (!domain.expiryDate || expiryDate > domain.expiryDate!)
+  ) {
+    domain.expiryDate = expiryDate;
+  }
   domain.wrappedOwner = owner.id;
   domain.save();
 
   let wrappedDomain = new WrappedDomain(node.toHex());
   wrappedDomain.domain = domain.id;
-  wrappedDomain.expiryDate = event.params.expiry;
-  wrappedDomain.fuses = fuses.toI32();
+  wrappedDomain.expiryDate = expiryDate;
+  wrappedDomain.fuses = fuses;
   wrappedDomain.owner = owner.id;
   wrappedDomain.name = name;
   wrappedDomain.save();
@@ -90,8 +104,8 @@ export function handleNameWrapped(event: NameWrappedEvent): void {
   let nameWrappedEvent = new NameWrapped(createEventID(event));
   nameWrappedEvent.domain = domain.id;
   nameWrappedEvent.name = name;
-  nameWrappedEvent.fuses = fuses.toI32();
-  nameWrappedEvent.expiryDate = event.params.expiry;
+  nameWrappedEvent.fuses = fuses;
+  nameWrappedEvent.expiryDate = expiryDate;
   nameWrappedEvent.owner = owner.id;
   nameWrappedEvent.blockNumber = blockNumber;
   nameWrappedEvent.transactionID = transactionID;
@@ -106,6 +120,9 @@ export function handleNameUnwrapped(event: NameUnwrappedEvent): void {
 
   let domain = createOrLoadDomain(node.toHex());
   domain.wrappedOwner = null;
+  if (domain.expiryDate && domain.parent !== ETH_NODE) {
+    domain.expiryDate = null;
+  }
   domain.save();
 
   let nameUnwrappedEvent = new NameUnwrapped(createEventID(event));
@@ -127,6 +144,13 @@ export function handleFusesSet(event: FusesSetEvent): void {
   if (wrappedDomain) {
     wrappedDomain.fuses = fuses.toI32();
     wrappedDomain.save();
+    if (wrappedDomain.expiryDate && checkPccBurned(wrappedDomain.fuses)) {
+      let domain = createOrLoadDomain(node.toHex());
+      if (!domain.expiryDate || wrappedDomain.expiryDate > domain.expiryDate!) {
+        domain.expiryDate = wrappedDomain.expiryDate;
+        domain.save();
+      }
+    }
   }
   let fusesBurnedEvent = new FusesSet(createEventID(event));
   fusesBurnedEvent.domain = node.toHex();
@@ -145,6 +169,13 @@ export function handleExpiryExtended(event: ExpiryExtendedEvent): void {
   if (wrappedDomain) {
     wrappedDomain.expiryDate = expiry;
     wrappedDomain.save();
+    if (checkPccBurned(wrappedDomain.fuses)) {
+      let domain = createOrLoadDomain(node.toHex());
+      if (!domain.expiryDate || expiry > domain.expiryDate!) {
+        domain.expiryDate = expiry;
+        domain.save();
+      }
+    }
   }
   let expiryExtendedEvent = new ExpiryExtended(createEventID(event));
   expiryExtendedEvent.domain = node.toHex();

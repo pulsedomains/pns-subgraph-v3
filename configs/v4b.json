@@ -4,17 +4,17 @@
     "Address": "0x7F66849c64e5bd2BA4601Aa87ce790178dBb463b",
     "StartBlock": 16566177
   },
-  "Resolver": {
-    "Address": "0x4b42d9bFc40E7D7524Fa00a563932FaD11244932",
-    "StartBlock": 16566281
-  },
   "BaseRegistrar": {
     "Address": "0x2ca3524162Cf13aA149A22b3Ba687360c9b5C570",
     "StartBlock": 16566204
   },
-  "EthRegistrarController": {
+  "EthRegistrarControllerOld": {
     "Address": "0xf552b4886Bf2566CC0Ab700b8617563F6885Bdea",
     "StartBlock": 16566266
+  },
+  "EthRegistrarController": {
+    "Address": "0xB2487AF63223182050b1f160850c26a38eF7FF29",
+    "StartBlock": 16740402
   },
   "NameWrapper": {
     "Address": "0xB854C21c0cE5bE6F66F110b4Ffe9c36AD5B20Ea9",

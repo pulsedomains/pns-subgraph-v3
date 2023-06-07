@@ -15,22 +15,34 @@ type Domain @entity {
   subdomainCount: Int!
   "Address logged from current resolver, if any"
   resolvedAddress: Account
-  "The account that owns the domain"
-  owner: Account!
+
   "The resolver that controls the domain's settings"
   resolver: Resolver
   "The time-to-live (TTL) value of the domain's records"
   ttl: BigInt
+
   "Indicates whether the domain has been migrated to a new registrar"
   isMigrated: Boolean!
   "The time when the domain was created"
   createdAt: BigInt!
-  "The events associated with the domain"
-  events: [DomainEvent!]! @derivedFrom(field: "domain")
+
+  "The account that owns the domain"
+  owner: Account!
+  "The account that owns the ERC721 NFT for the domain"
+  registrant: Account
+  "The account that owns the wrapped domain"
+  wrappedOwner: Account
+
+  "The expiry date for the domain, from either the registration, or the wrapped domain if PCC is burned"
+  expiryDate: BigInt
+
   "The registration associated with the domain"
   registration: Registration @derivedFrom(field: "domain")
   "The wrapped domain associated with the domain"
   wrappedDomain: WrappedDomain @derivedFrom(field: "domain")
+
+  "The events associated with the domain"
+  events: [DomainEvent!]! @derivedFrom(field: "domain")
 }
 
 interface DomainEvent {

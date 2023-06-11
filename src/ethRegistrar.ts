@@ -6,6 +6,7 @@ import {
   checkValidLabel,
   concat,
   createEventID,
+  ETH_NODE,
   uint256ToByteArray,
 } from "./utils";
 
@@ -34,7 +35,9 @@ import {
   Registration,
 } from "./types/schema";
 
-var rootNode:ByteArray = byteArrayFromHex("55fb31aa6f23709345f51ac8d7e4ed79336defe55be2733bc226ed0f1f62f3c8")
+const GRACE_PERIOD_SECONDS = BigInt.fromI32(2592000); // 30 days
+
+var rootNode: ByteArray = byteArrayFromHex(ETH_NODE);
 
 export function handleNameRegistered(event: NameRegisteredEvent): void {
   let account = new Account(event.params.owner.toHex());
@@ -48,6 +51,9 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
   registration.registrationDate = event.block.timestamp;
   registration.expiryDate = event.params.expires;
   registration.registrant = account.id;
+
+  domain.registrant = account.id;
+  domain.expiryDate = event.params.expires.plus(GRACE_PERIOD_SECONDS);
 
   let labelName = ens.nameByHash(label.toHexString());
   if (labelName != null) {
@@ -105,8 +111,13 @@ function setNamePreimage(name: string, label: Bytes, cost: BigInt): void {
 export function handleNameRenewed(event: NameRenewedEvent): void {
   let label = uint256ToByteArray(event.params.id);
   let registration = Registration.load(label.toHex())!;
+  let domain = Domain.load(crypto.keccak256(concat(rootNode, label)).toHex())!;
+
   registration.expiryDate = event.params.expires;
+  domain.expiryDate = event.params.expires.plus(GRACE_PERIOD_SECONDS);
+
   registration.save();
+  domain.save();
 
   let registrationEvent = new NameRenewed(createEventID(event));
   registrationEvent.registration = registration.id;
@@ -124,7 +135,12 @@ export function handleNameTransferred(event: TransferEvent): void {
   let registration = Registration.load(label.toHex());
   if (registration == null) return;
 
+  let domain = Domain.load(crypto.keccak256(concat(rootNode, label)).toHex())!;
+
   registration.registrant = account.id;
+  domain.registrant = account.id;
+
+  domain.save();
   registration.save();
 
   let transferEvent = new NameTransferred(createEventID(event));

@@ -9,6 +9,8 @@ export function createEventID(event: ethereum.Event): string {
     .concat(event.logIndex.toString());
 }
 
+export const ETH_NODE =
+  "0x55fb31aa6f23709345f51ac8d7e4ed79336defe55be2733bc226ed0f1f62f3c8";
 export const ROOT_NODE =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
 export const EMPTY_ADDRESS = "0x0000000000000000000000000000000000000000";

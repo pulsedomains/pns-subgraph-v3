@@ -140,6 +140,7 @@ dataSources:
       file: ./src/ethRegistrar.ts
       entities:
         - Registration
+        - Blacklist
       abis:
         - name: EthRegistrarController
           file: ./abis/EthRegistrarController.json
@@ -150,6 +151,8 @@ dataSources:
           handler: handleNameRegisteredByController
         - event: "NameRenewed(string,indexed bytes32,uint256,uint256)"
           handler: handleNameRenewedByController
+        - event: "BlacklistChanged(indexed address,bool)"
+          handler: handleBlacklistChanged
   - kind: ethereum/contract
     name: NameWrapper
     network: {{network}}

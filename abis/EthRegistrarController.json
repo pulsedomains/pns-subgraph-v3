@@ -30,6 +30,11 @@
         "internalType": "contract INameWrapper",
         "name": "_nameWrapper",
         "type": "address"
+      },
+      {
+        "internalType": "contract ENS",
+        "name": "_ens",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
@@ -114,6 +119,25 @@
     ],
     "name": "UnexpiredCommitmentExists",
     "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "banned",
+        "type": "bool"
+      }
+    ],
+    "name": "BlacklistChanged",
+    "type": "event"
   },
   {
     "anonymous": false,
@@ -243,6 +267,19 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "_newPrices",
+        "type": "address"
+      }
+    ],
+    "name": "changePricesFeed",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "_newBasisPoints",
         "type": "uint256"
@@ -283,6 +320,19 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "_newState",
+        "type": "bool"
+      }
+    ],
+    "name": "enableReferral",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -441,6 +491,19 @@
   },
   {
     "inputs": [],
+    "name": "referralEnabled",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "referralFeeBasisPoints",
     "outputs": [
       {
@@ -584,6 +647,24 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "wallet",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "isBlacklist",
+        "type": "bool"
+      }
+    ],
+    "name": "setReferrerBlacklist",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

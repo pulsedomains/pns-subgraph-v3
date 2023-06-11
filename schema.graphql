@@ -420,3 +420,23 @@ type VersionChanged implements ResolverEvent @entity {
   "The new version number of the resolver"
   version: BigInt!
 }
+
+type Blacklist @entity {
+  "User address"
+  id: ID!
+  "Banned or not"
+  banned: Boolean!
+}
+
+type BlacklistChanged @entity {
+  "Unique identifier for this event"
+  id: ID!
+  "Blacklist address"
+  account: String!
+  "Banned or not"
+  banned: Boolean!
+  "The block number at which the event occurred"
+  blockNumber: Int!
+  "The transaction hash of the transaction that triggered the event"
+  transactionID: Bytes!
+}

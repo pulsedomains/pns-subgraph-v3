@@ -19,11 +19,14 @@ import {
 import {
   NameRegistered as ControllerNameRegisteredEvent,
   NameRenewed as ControllerNameRenewedEvent,
+  BlacklistChanged as BlacklistChangedEvent,
 } from "./types/EthRegistrarController/EthRegistrarController";
 
 // Import entity types generated from the GraphQL schema
 import {
   Account,
+  Blacklist,
+  BlacklistChanged,
   Domain,
   NameRegistered,
   NameRenewed,
@@ -130,4 +133,20 @@ export function handleNameTransferred(event: TransferEvent): void {
   transferEvent.transactionID = event.transaction.hash;
   transferEvent.newOwner = account.id;
   transferEvent.save();
+}
+
+export function handleBlacklistChanged(event: BlacklistChangedEvent): void {
+  let blacklist = Blacklist.load(event.params.account.toHex());
+  if (blacklist == null) {
+    blacklist = new Blacklist(event.params.account.toHex());
+  }
+  blacklist.banned = event.params.banned;
+  blacklist.save();
+
+  let blacklistChangedEvent = new BlacklistChanged(createEventID(event));
+  blacklistChangedEvent.account = event.params.account.toHex();
+  blacklistChangedEvent.banned = event.params.banned;
+  blacklistChangedEvent.blockNumber = event.block.number.toI32();
+  blacklistChangedEvent.transactionID = event.transaction.hash;
+  blacklistChangedEvent.save();
 }

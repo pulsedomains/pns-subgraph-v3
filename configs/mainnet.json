@@ -4,10 +4,6 @@
     "Address": "",
     "StartBlock": 0
   },
-  "Resolver": {
-    "Address": "",
-    "StartBlock": 0
-  },
   "BaseRegistrar": {
     "Address": "",
     "StartBlock": 0
@@ -18,6 +14,9 @@
   },
   "NameWrapper": {
     "Address": "",
+    "StartBlock": 0
+  },
+  "Resolver": {
     "StartBlock": 0
   }
 }

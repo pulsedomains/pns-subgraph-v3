@@ -1,19 +1,22 @@
 {
   "network": "tpulse4",
   "ENSRegistry": {
-    "Address": "0xADB2ec98793988f96632f6Ce9bbbeDdF3E30fe43",
-    "StartBlock": 16915179
+    "Address": "0xA8A744d2aC5ceCb63dCe018e6aBeb85c2a512730",
+    "StartBlock": 16921858
   },
   "BaseRegistrar": {
-    "Address": "0x629f54B95d51f002aDE022E1b99f29516534bD27",
-    "StartBlock": 16915190
+    "Address": "0x1B8D2d193C7Fff9AE194E49b047A440bDF1dCA17",
+    "StartBlock": 16921871
   },
   "EthRegistrarController": {
-    "Address": "0x50ad81e4154C25d74add730eEeed81E03025b37b",
-    "StartBlock": 16915214
+    "Address": "0xb23FA68Bb7B7f1779c6bd7d44132e0cA95518421",
+    "StartBlock": 16921889
   },
   "NameWrapper": {
-    "Address": "0x7d0d8Ca3c55297258C6CaDcD2457698698fC8fe6",
-    "StartBlock": 16915211
+    "Address": "0x552415bf1A453A6D16c118A306414A4e30149462",
+    "StartBlock": 16921883
+  },
+  "Resolver": {
+    "StartBlock": 16921878
   }
 }

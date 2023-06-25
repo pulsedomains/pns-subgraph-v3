@@ -1,5 +1,5 @@
 // Import types and APIs from graph-ts
-import { BigInt, ByteArray, Bytes, crypto, ens } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, ByteArray, Bytes, crypto, ens } from "@graphprotocol/graph-ts";
 
 import {
   byteArrayFromHex,
@@ -21,6 +21,7 @@ import {
   NameRegistered as ControllerNameRegisteredEvent,
   NameRenewed as ControllerNameRenewedEvent,
   BlacklistChanged as BlacklistChangedEvent,
+  ReferralFeeReceived as ReferralFeeReceivedEvent
 } from "./types/EthRegistrarController/EthRegistrarController";
 
 // Import entity types generated from the GraphQL schema
@@ -32,6 +33,8 @@ import {
   NameRegistered,
   NameRenewed,
   NameTransferred,
+  ReferralFeeReceived,
+  Referrer,
   Registration,
 } from "./types/schema";
 
@@ -165,4 +168,23 @@ export function handleBlacklistChanged(event: BlacklistChangedEvent): void {
   blacklistChangedEvent.blockNumber = event.block.number.toI32();
   blacklistChangedEvent.transactionID = event.transaction.hash;
   blacklistChangedEvent.save();
+}
+
+export function handleReferralFeeReceived(event: ReferralFeeReceivedEvent): void {
+  let referrer = Referrer.load(event.params.referrer.toHex());
+  if (referrer == null) {
+    referrer = new Referrer(event.params.referrer.toHex());
+    referrer.count = 0;
+    referrer.commission = BigDecimal.zero();
+  }
+  referrer.count += 1;
+  referrer.commission = referrer.commission.plus(
+    event.params.amount.div(new BigInt(10).pow(18)
+  ).toBigDecimal());
+  referrer.save();
+
+  let referralFeeReceivedEvent = new ReferralFeeReceived(createEventID(event));
+  referralFeeReceivedEvent.referrer = event.params.referrer.toHex();
+  referralFeeReceivedEvent.amount = event.params.amount;
+  referralFeeReceivedEvent.save();
 }

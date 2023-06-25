@@ -129,6 +129,8 @@ dataSources:
           handler: handleNameRenewedByController
         - event: "BlacklistChanged(indexed address,bool)"
           handler: handleBlacklistChanged
+        - event: "ReferralFeeReceived(indexed address,uint256)"
+          handler: handleReferralFeeReceived
   - kind: ethereum/contract
     name: NameWrapper
     network: {{network}}

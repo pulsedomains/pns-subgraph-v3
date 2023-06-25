@@ -452,3 +452,21 @@ type BlacklistChanged @entity {
   "The transaction hash of the transaction that triggered the event"
   transactionID: Bytes!
 }
+
+type Referrer @entity {
+  "User address"
+  id: ID!
+  "Total commission"
+  commission: BigDecimal!
+  "Total referrals"
+  count: Int!
+}
+
+type ReferralFeeReceived @entity {
+  "User address"
+  id: ID!
+  "Referrer address"
+  referrer: String!
+  "Amount"
+  amount: BigInt!
+}

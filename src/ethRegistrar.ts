@@ -178,9 +178,9 @@ export function handleReferralFeeReceived(event: ReferralFeeReceivedEvent): void
     referrer.commission = BigDecimal.zero();
   }
   referrer.count += 1;
-  referrer.commission = referrer.commission.plus(
-    event.params.amount.div(new BigInt(10).pow(18)
-  ).toBigDecimal());
+  if (!event.params.amount.isZero()) {
+    referrer.commission = referrer.commission.plus(event.params.amount.toBigDecimal());
+  }
   referrer.save();
 
   let referralFeeReceivedEvent = new ReferralFeeReceived(createEventID(event));

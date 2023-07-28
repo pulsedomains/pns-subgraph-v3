@@ -14,6 +14,7 @@ export const ETH_NODE =
 export const ROOT_NODE =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
 export const EMPTY_ADDRESS = "0x0000000000000000000000000000000000000000";
+export const EMPTY_ADDRESS_BYTEARRAY = new ByteArray(20);
 
 // Helper for concatenating two byte arrays
 export function concat(a: ByteArray, b: ByteArray): ByteArray {

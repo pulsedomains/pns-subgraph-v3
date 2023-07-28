@@ -1,7 +1,13 @@
 // Import types and APIs from graph-ts
 import { BigInt, crypto, ens } from "@graphprotocol/graph-ts";
 
-import { concat, createEventID, EMPTY_ADDRESS, ROOT_NODE } from "./utils";
+import {
+  concat,
+  createEventID,
+  EMPTY_ADDRESS,
+  EMPTY_ADDRESS_BYTEARRAY,
+  ROOT_NODE,
+} from "./utils";
 
 // Import event types from the registry contract ABI
 import {
@@ -165,7 +171,7 @@ export function handleNewResolver(event: NewResolverEvent): void {
 
   // if resolver is set to 0x0, set id to null
   // we don't want to create a resolver entity for 0x0
-  if (event.params.resolver.toHexString() === EMPTY_ADDRESS) {
+  if (event.params.resolver.equals(EMPTY_ADDRESS_BYTEARRAY)) {
     id = null;
   } else {
     id = event.params.resolver

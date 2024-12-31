@@ -420,6 +420,23 @@ type InterfaceChanged implements ResolverEvent @entity {
   implementer: Bytes!
 }
 
+type AuthorisationChanged implements ResolverEvent @entity {
+  "Unique identifier for this event"
+  id: ID!
+  "The resolver associated with this event"
+  resolver: Resolver!
+  "The block number at which the event occurred"
+  blockNumber: Int!
+  "The transaction hash associated with the event"
+  transactionID: Bytes!
+  "The owner of the authorisation"
+  owner: Bytes!
+  "The target of the authorisation"
+  target: Bytes!
+  "Whether the authorisation was added or removed"
+  isAuthorized: Boolean!
+}
+
 type VersionChanged implements ResolverEvent @entity {
   "Unique identifier for this event"
   id: ID!

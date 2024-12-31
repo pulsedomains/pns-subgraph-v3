@@ -2,7 +2,6 @@
 import { BigDecimal, BigInt, ByteArray, Bytes, crypto, ens } from "@graphprotocol/graph-ts";
 
 import {
-  byteArrayFromHex,
   checkValidLabel,
   concat,
   createEventID,
@@ -40,7 +39,7 @@ import {
 
 const GRACE_PERIOD_SECONDS = BigInt.fromI32(2592000); // 30 days
 
-var rootNode: ByteArray = byteArrayFromHex(ETH_NODE);
+var rootNode: ByteArray = ByteArray.fromHexString(ETH_NODE);
 
 export function handleNameRegistered(event: NameRegisteredEvent): void {
   let account = new Account(event.params.owner.toHex());
@@ -59,7 +58,7 @@ export function handleNameRegistered(event: NameRegisteredEvent): void {
   domain.expiryDate = event.params.expires.plus(GRACE_PERIOD_SECONDS);
 
   let labelName = ens.nameByHash(label.toHexString());
-  if (labelName != null) {
+  if (checkValidLabel(labelName)) {
     domain.labelName = labelName;
     domain.name = labelName! + ".pls";
     registration.labelName = labelName;
@@ -98,7 +97,7 @@ function setNamePreimage(name: string, label: Bytes, cost: BigInt): void {
   }
 
   let domain = Domain.load(crypto.keccak256(concat(rootNode, label)).toHex())!;
-  if (domain.labelName !== name) {
+  if (domain.labelName != name) {
     domain.labelName = name;
     domain.name = name + ".pls";
     domain.save();

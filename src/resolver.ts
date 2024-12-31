@@ -4,11 +4,13 @@ import {
   ABIChanged as ABIChangedEvent,
   AddrChanged as AddrChangedEvent,
   AddressChanged as AddressChangedEvent,
+  AuthorisationChanged as AuthorisationChangedEvent,
   ContenthashChanged as ContenthashChangedEvent,
   InterfaceChanged as InterfaceChangedEvent,
   NameChanged as NameChangedEvent,
   PubkeyChanged as PubkeyChangedEvent,
-  TextChanged as TextChangedWithValueEvent,
+  TextChanged as TextChangedEvent,
+  TextChanged1 as TextChangedWithValueEvent,
   VersionChanged as VersionChangedEvent,
 } from "./types/Resolver/Resolver";
 
@@ -16,6 +18,7 @@ import {
   AbiChanged,
   Account,
   AddrChanged,
+  AuthorisationChanged,
   ContenthashChanged,
   Domain,
   InterfaceChanged,
@@ -54,7 +57,7 @@ export function handleAddrChanged(event: AddrChangedEvent): void {
 }
 
 export function handleMulticoinAddrChanged(event: AddressChangedEvent): void {
-  let resolver = getOrCreateResolver(event.params.node, event.address);
+  let resolver = getOrCreateResolver(event.params.node, event.address, false);
 
   let coinType = event.params.coinType;
   if (resolver.coinTypes == null) {
@@ -81,8 +84,10 @@ export function handleMulticoinAddrChanged(event: AddressChangedEvent): void {
 export function handleNameChanged(event: NameChangedEvent): void {
   if (event.params.name.indexOf("\u0000") != -1) return;
 
+  const resolver = getOrCreateResolver(event.params.node, event.address, true);
+
   let resolverEvent = new NameChanged(createEventID(event));
-  resolverEvent.resolver = createResolverID(event.params.node, event.address);
+  resolverEvent.resolver = resolver.id;
   resolverEvent.blockNumber = event.block.number.toI32();
   resolverEvent.transactionID = event.transaction.hash;
   resolverEvent.name = event.params.name;
@@ -90,8 +95,10 @@ export function handleNameChanged(event: NameChangedEvent): void {
 }
 
 export function handleABIChanged(event: ABIChangedEvent): void {
+  const resolver = getOrCreateResolver(event.params.node, event.address, true);
+
   let resolverEvent = new AbiChanged(createEventID(event));
-  resolverEvent.resolver = createResolverID(event.params.node, event.address);
+  resolverEvent.resolver = resolver.id;
   resolverEvent.blockNumber = event.block.number.toI32();
   resolverEvent.transactionID = event.transaction.hash;
   resolverEvent.contentType = event.params.contentType;
@@ -99,8 +106,10 @@ export function handleABIChanged(event: ABIChangedEvent): void {
 }
 
 export function handlePubkeyChanged(event: PubkeyChangedEvent): void {
+  const resolver = getOrCreateResolver(event.params.node, event.address, true);
+
   let resolverEvent = new PubkeyChanged(createEventID(event));
-  resolverEvent.resolver = createResolverID(event.params.node, event.address);
+  resolverEvent.resolver = resolver.id;
   resolverEvent.blockNumber = event.block.number.toI32();
   resolverEvent.transactionID = event.transaction.hash;
   resolverEvent.x = event.params.x;
@@ -108,10 +117,8 @@ export function handlePubkeyChanged(event: PubkeyChangedEvent): void {
   resolverEvent.save();
 }
 
-export function handleTextChangedWithValue(
-  event: TextChangedWithValueEvent
-): void {
-  let resolver = getOrCreateResolver(event.params.node, event.address);
+export function handleTextChanged(event: TextChangedEvent): void {
+  let resolver = getOrCreateResolver(event.params.node, event.address, false);
 
   let key = event.params.key;
   if (resolver.texts == null) {
@@ -127,7 +134,33 @@ export function handleTextChangedWithValue(
   }
 
   let resolverEvent = new TextChanged(createEventID(event));
-  resolverEvent.resolver = createResolverID(event.params.node, event.address);
+  resolverEvent.resolver = resolver.id;
+  resolverEvent.blockNumber = event.block.number.toI32();
+  resolverEvent.transactionID = event.transaction.hash;
+  resolverEvent.key = event.params.key;
+  resolverEvent.save();
+}
+
+export function handleTextChangedWithValue(
+  event: TextChangedWithValueEvent
+): void {
+  let resolver = getOrCreateResolver(event.params.node, event.address, false);
+
+  let key = event.params.key;
+  if (resolver.texts == null) {
+    resolver.texts = [key];
+    resolver.save();
+  } else {
+    let texts = resolver.texts!;
+    if (!texts.includes(key)) {
+      texts.push(key);
+      resolver.texts = texts;
+      resolver.save();
+    }
+  }
+
+  let resolverEvent = new TextChanged(createEventID(event));
+  resolverEvent.resolver = resolver.id;
   resolverEvent.blockNumber = event.block.number.toI32();
   resolverEvent.transactionID = event.transaction.hash;
   resolverEvent.key = event.params.key;
@@ -136,12 +169,12 @@ export function handleTextChangedWithValue(
 }
 
 export function handleContentHashChanged(event: ContenthashChangedEvent): void {
-  let resolver = getOrCreateResolver(event.params.node, event.address);
+  let resolver = getOrCreateResolver(event.params.node, event.address, false);
   resolver.contentHash = event.params.hash;
   resolver.save();
 
   let resolverEvent = new ContenthashChanged(createEventID(event));
-  resolverEvent.resolver = createResolverID(event.params.node, event.address);
+  resolverEvent.resolver = resolver.id;
   resolverEvent.blockNumber = event.block.number.toI32();
   resolverEvent.transactionID = event.transaction.hash;
   resolverEvent.hash = event.params.hash;
@@ -149,12 +182,29 @@ export function handleContentHashChanged(event: ContenthashChangedEvent): void {
 }
 
 export function handleInterfaceChanged(event: InterfaceChangedEvent): void {
+  const resolver = getOrCreateResolver(event.params.node, event.address, true);
+
   let resolverEvent = new InterfaceChanged(createEventID(event));
-  resolverEvent.resolver = createResolverID(event.params.node, event.address);
+  resolverEvent.resolver = resolver.id;
   resolverEvent.blockNumber = event.block.number.toI32();
   resolverEvent.transactionID = event.transaction.hash;
   resolverEvent.interfaceID = event.params.interfaceID;
   resolverEvent.implementer = event.params.implementer;
+  resolverEvent.save();
+}
+
+export function handleAuthorisationChanged(
+  event: AuthorisationChangedEvent
+): void {
+  const resolver = getOrCreateResolver(event.params.node, event.address, true);
+
+  let resolverEvent = new AuthorisationChanged(createEventID(event));
+  resolverEvent.blockNumber = event.block.number.toI32();
+  resolverEvent.transactionID = event.transaction.hash;
+  resolverEvent.resolver = resolver.id;
+  resolverEvent.owner = event.params.owner;
+  resolverEvent.target = event.params.target;
+  resolverEvent.isAuthorized = event.params.isAuthorised;
   resolverEvent.save();
 }
 
@@ -167,12 +217,12 @@ export function handleVersionChanged(event: VersionChangedEvent): void {
   resolverEvent.save();
 
   let domain = Domain.load(event.params.node.toHexString());
-  if (domain && domain.resolver === resolverEvent.resolver) {
+  if (domain && domain.resolver == resolverEvent.resolver) {
     domain.resolvedAddress = null;
     domain.save();
   }
 
-  let resolver = getOrCreateResolver(event.params.node, event.address);
+  let resolver = getOrCreateResolver(event.params.node, event.address, false);
   resolver.addr = null;
   resolver.contentHash = null;
   resolver.texts = null;
@@ -180,13 +230,20 @@ export function handleVersionChanged(event: VersionChangedEvent): void {
   resolver.save();
 }
 
-function getOrCreateResolver(node: Bytes, address: Address): Resolver {
+function getOrCreateResolver(
+  node: Bytes,
+  address: Address,
+  saveOnNew: boolean
+): Resolver {
   let id = createResolverID(node, address);
   let resolver = Resolver.load(id);
-  if (resolver === null) {
+  if (resolver == null) {
     resolver = new Resolver(id);
     resolver.domain = node.toHexString();
     resolver.address = address;
+    if (saveOnNew) {
+      resolver.save();
+    }
   }
   return resolver as Resolver;
 }
@@ -198,7 +255,7 @@ function createEventID(event: ethereum.Event): string {
     .concat(event.logIndex.toString());
 }
 
-function createResolverID(node: Bytes, resolver: Address): string {
+export function createResolverID(node: Bytes, resolver: Address): string {
   return resolver
     .toHexString()
     .concat("-")

@@ -74,6 +74,8 @@ typings/
 .idea
 
 .vscode
+
 /tests/.bin
+/tests/.latest.json
 
 subgraph.yaml

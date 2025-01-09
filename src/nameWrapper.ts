@@ -34,7 +34,7 @@ function decodeName(buf: Bytes): Array<string> | null {
   let len = buf[offset++];
   let hex = buf.toHexString();
   let firstLabel = "";
-  if (len === 0) {
+  if (len == 0) {
     return [firstLabel, "."];
   }
 
@@ -68,7 +68,7 @@ export function handleNameWrapped(event: NameWrappedEvent): void {
   let decoded = decodeName(event.params.name);
   let label: string | null = null;
   let name: string | null = null;
-  if (decoded !== null) {
+  if (decoded != null) {
     label = decoded[0];
     name = decoded[1];
   }
@@ -120,7 +120,7 @@ export function handleNameUnwrapped(event: NameUnwrappedEvent): void {
 
   let domain = createOrLoadDomain(node.toHex());
   domain.wrappedOwner = null;
-  if (domain.expiryDate && domain.parent !== ETH_NODE) {
+  if (domain.expiryDate && domain.parent != ETH_NODE) {
     domain.expiryDate = null;
   }
   domain.save();
@@ -193,12 +193,7 @@ function makeWrappedTransfer(
   to: string
 ): void {
   const _to = createOrLoadAccount(to);
-  const namehash =
-    "0x" +
-    node
-      .toHex()
-      .slice(2)
-      .padStart(64, "0");
+  const namehash = "0x" + node.toHex().slice(2).padStart(64, "0");
   const domain = createOrLoadDomain(namehash);
   let wrappedDomain = WrappedDomain.load(namehash);
   // new registrations emit the Transfer` event before the NameWrapped event
@@ -242,9 +237,7 @@ export function handleTransferBatch(event: TransferBatchEvent): void {
     makeWrappedTransfer(
       blockNumber,
       transactionID,
-      createEventID(event)
-        .concat("-")
-        .concat(i.toString()),
+      createEventID(event).concat("-").concat(i.toString()),
       ids[i],
       to.toHex()
     );

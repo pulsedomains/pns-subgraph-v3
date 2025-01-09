@@ -2,6 +2,7 @@
 import { BigInt, crypto, ens } from "@graphprotocol/graph-ts";
 
 import {
+  checkValidLabel,
   concat,
   createEventID,
   EMPTY_ADDRESS,
@@ -47,7 +48,7 @@ function getDomain(
   timestamp: BigInt = BIG_INT_ZERO
 ): Domain | null {
   let domain = Domain.load(node);
-  if (domain === null && node == ROOT_NODE) {
+  if (domain == null && node == ROOT_NODE) {
     return createDomain(node, timestamp);
   } else {
     return domain;
@@ -94,13 +95,13 @@ function _handleNewOwner(event: NewOwnerEvent, isMigrated: boolean): void {
   let domain = getDomain(subnode, event.block.timestamp);
   let parent = getDomain(event.params.node.toHexString());
 
-  if (domain === null) {
+  if (domain == null) {
     domain = new Domain(subnode);
     domain.createdAt = event.block.timestamp;
     domain.subdomainCount = 0;
   }
 
-  if (domain.parent === null && parent !== null) {
+  if (domain.parent == null && parent != null) {
     parent.subdomainCount = parent.subdomainCount + 1;
     parent.save();
   }
@@ -108,11 +109,9 @@ function _handleNewOwner(event: NewOwnerEvent, isMigrated: boolean): void {
   if (domain.name == null) {
     // Get label and node names
     let label = ens.nameByHash(event.params.label.toHexString());
-    if (label != null) {
+    if (checkValidLabel(label)) {
       domain.labelName = label;
-    }
-
-    if (label === null) {
+    } else {
       label = "[" + event.params.label.toHexString().slice(2) + "]";
     }
     if (

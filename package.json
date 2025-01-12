@@ -7,7 +7,7 @@
     "codegen": "graph codegen --output-dir src/types/",
     "test": "graph test",
     "build": "graph build",
-    "setup:main": "yarn prepare:main && yarn codegen && yarn create:main && yarn deploy:main",
+    "setup:main": "pnpm prepare:main && pnpm codegen && pnpm create:main && pnpm deploy:main",
     "prepare:main": "mustache configs/mainnet.json subgraph.template.yaml > subgraph.yaml",
     "create:main": "graph create graphprotocol/pns --node https://graph-node.pulse.domains",
     "deploy:main": "graph deploy graphprotocol/pns --ipfs https://ipfs.pulse.domains --node https://graph-node.pulse.domains --version-label 1.0.0",

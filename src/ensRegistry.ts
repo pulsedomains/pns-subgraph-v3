@@ -2,11 +2,13 @@
 import { BigInt, crypto, ens } from "@graphprotocol/graph-ts";
 
 import {
+  ADDR_REVERSE_NODE,
   checkValidLabel,
   concat,
   createEventID,
   EMPTY_ADDRESS,
   EMPTY_ADDRESS_BYTEARRAY,
+  ETH_NODE,
   ROOT_NODE,
 } from "./utils";
 
@@ -113,6 +115,11 @@ function _handleNewOwner(event: NewOwnerEvent, isMigrated: boolean): void {
       domain.labelName = label;
     } else {
       label = "[" + event.params.label.toHexString().slice(2) + "]";
+    }
+    if (domain.id == ETH_NODE) {
+      label = "pls";
+    } else if (domain.id == ADDR_REVERSE_NODE) {
+      label = "addr";
     }
     if (
       event.params.node.toHexString() ==
